@@ -1,4 +1,8 @@
-import { S3Client } from "@aws-sdk/client-s3";
+import {
+  S3Client,
+  ListObjectsV2Command,
+  DeleteObjectsCommand,
+} from "@aws-sdk/client-s3";
 
 const globalForS3 = globalThis as unknown as { s3?: S3Client };
 
@@ -35,4 +39,47 @@ export const ALLOWED_IMAGE_TYPES = Object.keys(MIME_TO_EXT);
 
 export function extForMime(mime: string): string | null {
   return MIME_TO_EXT[mime] ?? null;
+}
+
+export function keyFromPublicUrl(url: string): string | null {
+  const prefix = `${S3_PUBLIC_BASE_URL}/`;
+  return url.startsWith(prefix) ? url.slice(prefix.length) : null;
+}
+
+export type S3Object = { key: string; size: number; lastModified: Date };
+
+export async function listObjects(prefix: string): Promise<S3Object[]> {
+  const results: S3Object[] = [];
+  let continuationToken: string | undefined;
+  do {
+    const res = await s3.send(
+      new ListObjectsV2Command({
+        Bucket: S3_BUCKET,
+        Prefix: prefix,
+        ContinuationToken: continuationToken,
+      }),
+    );
+    for (const o of res.Contents ?? []) {
+      if (o.Key && o.Size !== undefined && o.LastModified) {
+        results.push({ key: o.Key, size: o.Size, lastModified: o.LastModified });
+      }
+    }
+    continuationToken = res.IsTruncated ? res.NextContinuationToken : undefined;
+  } while (continuationToken);
+  return results;
+}
+
+export async function deleteObjects(keys: string[]): Promise<number> {
+  let deleted = 0;
+  for (let i = 0; i < keys.length; i += 1000) {
+    const batch = keys.slice(i, i + 1000);
+    const res = await s3.send(
+      new DeleteObjectsCommand({
+        Bucket: S3_BUCKET,
+        Delete: { Objects: batch.map((Key) => ({ Key })) },
+      }),
+    );
+    deleted += res.Deleted?.length ?? 0;
+  }
+  return deleted;
 }

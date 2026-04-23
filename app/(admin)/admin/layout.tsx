@@ -3,7 +3,7 @@
 import "../../globals.css";
 import { useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { 
+import {
   MdDashboard,
   MdDescription,
   MdPeople,
@@ -13,7 +13,8 @@ import {
   MdClose,
   MdShield,
   MdNotifications,
-  MdSearch
+  MdSearch,
+  MdCleaningServices
 } from 'react-icons/md';
 
 interface AdminLayoutProps {
@@ -26,6 +27,7 @@ const menuItems = [
   { icon: MdPeople, label: 'Customers', href: '/admin/customers' },
   { icon: MdShield, label: 'Claims', href: '/admin/claims' },
   { icon: MdSettings, label: 'Settings', href: '/admin/settings' },
+  { icon: MdCleaningServices, label: 'Cleanup', href: '/admin/cleanup' },
 ];
 
 export default function AdminLayout({ children }: AdminLayoutProps) {

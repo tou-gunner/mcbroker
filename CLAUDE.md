@@ -70,7 +70,7 @@ User-uploaded images live in a MinIO bucket. Uploads go through a **server-proxy
 | `banner` | `banners/<uuid>.<ext>` |
 | `setting` | `settings/<entityKey>.<ext>` |
 
-**Compromise**: `insurance-content` (images dropped into the TipTap editor) is flat under `insurances/content/` rather than scoped by insurance ID. Reason: the create form opens before the insurance has an ID, and copy/rename-on-save is complexity we don't want. Trade-off: abandoned-draft uploads become orphans. A future reconciliation job can walk `InsuranceContent.contentHtml` to identify unreferenced objects.
+**Compromise**: `insurance-content` (images dropped into the TipTap editor) is flat under `insurances/content/` rather than scoped by insurance ID. Reason: the create form opens before the insurance has an ID, and copy/rename-on-save is complexity we don't want. Trade-off: abandoned-draft uploads become orphans — cleaned up via the orphan cleanup tool (next section).
 
 ### Bucket access
 
@@ -86,11 +86,35 @@ S3_ENDPOINT, S3_BUCKET, S3_ACCESS_KEY, S3_SECRET_KEY, S3_REGION, S3_PUBLIC_BASE_
 
 ### Migration of existing assets
 
-`scripts/migrate-assets-to-s3.ts` (run with `tsx scripts/migrate-assets-to-s3.ts`) uploads the 21 sample company logos, 3 banners, and `logo.png` to MinIO under the key layout above. Idempotent — safe to re-run. The referencing code ([app/services/company.ts](app/services/company.ts), `NavigationBar`, `HeroSection`) already points at the MinIO URLs, so the migration script must run before those URLs resolve.
+`scripts/migrate-assets-to-s3.ts` (run with `tsx scripts/migrate-assets-to-s3.ts`) uploads the 21 sample company logos, 3 banners, and `logo.png` to MinIO under the key layout above. Idempotent — safe to re-run. The referencing code ([app/services/company.ts](app/services/company.ts), `NavigationBar`, `HeroSection`) already points at the MinIO URLs, so the migration script must run before those URLs resolve. Bucket bootstrap (create bucket + apply public-read policy) is a separate one-off: `scripts/setup-minio-bucket.ts`.
 
 ### Next.js image optimization
 
 [next.config.ts](next.config.ts) whitelists `s3.mcins.la` in `images.remotePatterns`, so `next/image` `<Image>` components can optimize MinIO-hosted assets. Plain `<img>` tags don't need this.
+
+### Orphan cleanup
+
+The CMS has a manual cleanup tool at [/admin/cleanup](app/(admin)/admin/cleanup/page.tsx) backed by [app/api/admin/cleanup/orphans/route.ts](app/api/admin/cleanup/orphans/route.ts). It's the recovery valve for the `insurance-content` compromise above.
+
+**Flow** is `preview → select → delete`:
+- `GET /api/admin/cleanup/orphans?minAgeHours=N` lists objects under `insurances/` that are (a) **not referenced** anywhere in the DB and (b) older than `N` hours. Default `minAgeHours=24`.
+- `DELETE /api/admin/cleanup/orphans` with body `{ keys: [...] }` deletes the selected objects.
+
+**Reference extraction** ([app/lib/orphans.ts](app/lib/orphans.ts)) — `collectReferencedKeys()` walks:
+- `InsuranceContent.contentJson` — recursive TipTap tree walk, collects `type === 'image'` nodes' `attrs.src`.
+- `InsuranceContent.contentHtml` — regex `<img [^>]*src="…">`.
+- `InsuranceContent.images[]` — string array.
+- `Company.logo`, `Setting.value`.
+
+Only URLs starting with `S3_PUBLIC_BASE_URL` are turned into keys via [`keyFromPublicUrl()`](app/lib/s3.ts); external URLs are ignored. If you add a new DB field that stores a MinIO URL, **extend `collectReferencedKeys` or it will be deleted as an orphan**.
+
+**Guardrails in the DELETE handler**:
+1. **Prefix allow-list** — rejects any key not under `insurances/`. `companies/`, `banners/`, `site/`, `settings/` are immune.
+2. **Re-check before delete** — re-runs `collectReferencedKeys()` right before `DeleteObjects`, so uploads that raced between the scan and the delete are skipped (returned as `skippedNowReferenced`).
+
+**S3 helpers** in [app/lib/s3.ts](app/lib/s3.ts): `listObjects(prefix)` (paginated), `deleteObjects(keys)` (batched at 1000 per request — the S3 hard limit), `keyFromPublicUrl(url)`.
+
+**What's not protected**: `/api/admin/cleanup/orphans`, like every `/api/admin/*` route, has **no auth**. The prefix allow-list and re-check-before-delete limit the blast radius, but a curious visitor can still invoke it. Closing this is part of the broader admin-auth work.
 
 ## Prisma v7 specifics (important)
 
