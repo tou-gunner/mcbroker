@@ -114,7 +114,64 @@ Only URLs starting with `S3_PUBLIC_BASE_URL` are turned into keys via [`keyFromP
 
 **S3 helpers** in [app/lib/s3.ts](app/lib/s3.ts): `listObjects(prefix)` (paginated), `deleteObjects(keys)` (batched at 1000 per request — the S3 hard limit), `keyFromPublicUrl(url)`.
 
-**What's not protected**: `/api/admin/cleanup/orphans`, like every `/api/admin/*` route, has **no auth**. The prefix allow-list and re-check-before-delete limit the blast radius, but a curious visitor can still invoke it. Closing this is part of the broader admin-auth work.
+## Authentication
+
+Both `/admin/*` pages and `/api/admin/*` routes are gated behind a signed-in admin session. The lone exceptions are the login page itself and the login/logout endpoints.
+
+- **Mechanism**: hand-rolled JWT in an HttpOnly cookie (`mcins_session`), signed with `jose` (HS256, `JWT_SECRET`). No `next-auth`, no refresh tokens — the plan file at `/root/.claude/plans/admin-auth.md` has the rationale.
+- **Storage model**: `Admin` Prisma model (email + `passwordHash`). Password hashed with `bcryptjs` (cost 10, min 8 chars). Users are **created via CLI**, not through any UI.
+- **Session window**: `JWT_EXPIRES_IN` (default 1d). Sliding expiration — the middleware re-issues the cookie on any request made when >50% of the lifetime has elapsed, so active sessions don't die mid-work.
+
+### Enforcement
+
+[proxy.ts](proxy.ts) dispatches by URL prefix:
+
+| Path prefix | Behavior |
+|---|---|
+| `/admin/*` | JWT verified; redirect to `/admin/login?next=<original>` on failure |
+| `/api/admin/*` | JWT verified; return `401 {"error":"unauthorized"}` on failure |
+| `/`, `/(lo\|en)/*` | Passed to next-intl unchanged |
+
+Both admin guards also slide the cookie when appropriate.
+
+Exempt from the guard: `/admin/login`, `/api/admin/login`, `/api/admin/logout`.
+
+**Route-level checks are not required.** If a request reaches a `/api/admin/*` handler, the middleware already verified the session. Handlers that need the admin identity (e.g. for `createdBy`/`updatedBy` audit fields) call [`getSessionAdmin()`](app/lib/session.ts) from [app/lib/session.ts](app/lib/session.ts) — it reads the cookie and returns `{ id, email } | null`.
+
+### Files
+
+- [app/lib/auth.ts](app/lib/auth.ts) — `signSession`, `verifySession`, `shouldSlide`, cookie option helpers. Edge-runtime safe (used by middleware).
+- [app/lib/password.ts](app/lib/password.ts) — `hashPassword`, `verifyPassword`. Node-runtime only (bcrypt is CPU-bound).
+- [app/lib/session.ts](app/lib/session.ts) — server-only `getSessionAdmin()` / `requireSessionAdmin()`. Reads the cookie jar via `next/headers`.
+- [app/api/admin/login/route.ts](app/api/admin/login/route.ts) — POST login. In-process rate limit: 5 attempts / 15 min / IP.
+- [app/api/admin/logout/route.ts](app/api/admin/logout/route.ts) — POST logout (clears cookie).
+- [app/api/admin/me/route.ts](app/api/admin/me/route.ts) — GET logged-in admin's identity. The admin sidebar calls this to show the real email + initial.
+- [app/(admin)/admin/login/page.tsx](app/(admin)/admin/login/page.tsx) — login form.
+- [scripts/create-admin.ts](scripts/create-admin.ts) — CLI: `pnpm exec tsx scripts/create-admin.ts <email> <password> [name]`. Idempotent — re-running with the same email updates the hash.
+
+### Bootstrapping the first admin
+
+```bash
+pnpm exec tsx scripts/create-admin.ts you@example.com 'strongpass' 'Your Name'
+```
+
+There is no in-app signup. The script must run against a DB the admin has shell access to.
+
+### Cookie attributes
+
+HttpOnly; `Secure` in production (not in dev, since `http://localhost:3000` wouldn't accept it); `SameSite=Lax` (strict breaks post-login redirects); `Path=/`; `Max-Age` = `JWT_EXPIRES_IN`.
+
+### Force-logout everyone
+
+There is no per-device revocation — stateless JWTs can't be revoked mid-life. To invalidate all existing sessions, rotate `JWT_SECRET` in `.env` and restart. All in-flight tokens become invalid on the next request.
+
+### What's intentionally not here
+
+- No password reset (no email provider wired).
+- No MFA / OAuth / social login.
+- No role-based access control — all admins have full access.
+- Rate limit is in-process only (single-PM2-instance assumption). Move to Redis if the app scales horizontally.
+- SameSite=Lax is the only CSRF protection. No CSRF token scheme; fine for same-origin admin CRUD.
 
 ## Prisma v7 specifics (important)
 

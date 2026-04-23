@@ -1,7 +1,7 @@
 'use client';
 
 import "../../globals.css";
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   MdDashboard,
@@ -32,13 +32,43 @@ const menuItems = [
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [adminEmail, setAdminEmail] = useState<string | null>(null);
   const pathname = usePathname();
   const router = useRouter();
 
-  const handleLogout = () => {
-    // Add logout logic here
-    router.push('/');
+  const isLoginPage = pathname === '/admin/login';
+
+  useEffect(() => {
+    if (isLoginPage) return;
+    let active = true;
+    fetch('/api/admin/me')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (active && data?.email) setAdminEmail(data.email);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [isLoginPage]);
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/admin/logout', { method: 'POST' });
+    } catch {
+      /* ignore — cookie clear is best-effort, redirect always happens */
+    }
+    router.push('/admin/login');
+    router.refresh();
   };
+
+  if (isLoginPage) {
+    return (
+      <html>
+        <body>{children}</body>
+      </html>
+    );
+  }
 
   return (<html>
     <body>
@@ -135,10 +165,14 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 {/* User Profile */}
                 <div className="flex items-center space-x-3">
                   <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                    <span className="text-white font-medium text-sm">A</span>
+                    <span className="text-white font-medium text-sm">
+                      {adminEmail ? adminEmail[0].toUpperCase() : 'A'}
+                    </span>
                   </div>
                   <div className="hidden md:block">
-                    <p className="text-sm font-medium text-gray-700">Admin User</p>
+                    <p className="text-sm font-medium text-gray-700">
+                      {adminEmail ?? 'Loading…'}
+                    </p>
                     <p className="text-xs text-gray-500">Administrator</p>
                   </div>
                 </div>
