@@ -1,0 +1,203 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Enums for type safety
+enum InsuranceStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+  UNDER_REVIEW
+}
+
+model Admin {
+  id String @id @default(uuid())
+  email String @unique
+  name String
+  passwordHash String @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("admins")
+}
+
+model Company {
+  id         String            @id @default(uuid())
+  slug       String            @unique
+  logo       String?
+  createdAt  DateTime          @default(now()) @map("created_at")
+  updatedAt  DateTime          @updatedAt @map("updated_at")
+  metadata   CompanyMetadata[]
+  insurances Insurance[]
+
+  @@index([slug])
+  @@map("companies")
+}
+
+model CompanyMetadata {
+  id        String   @id @default(uuid())
+  companyId String   @map("company_id")
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  locale    String
+  key       String
+  value     String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([companyId, locale, key])
+  @@index([companyId, locale])
+  @@map("company_metadata")
+}
+
+model InsuranceCategory {
+  id          String                       @id @default(uuid())
+  slug        String                       @unique
+  description String?
+  createdAt   DateTime                     @default(now()) @map("created_at")
+  updatedAt   DateTime                     @updatedAt @map("updated_at")
+  metadata    InsuranceCategoryMetadata[]
+  insurances  Insurance[]
+
+  @@index([slug])
+  @@map("insurance_categories")
+}
+
+model InsuranceCategoryMetadata {
+  id         String            @id @default(uuid())
+  categoryId String            @map("category_id")
+  category   InsuranceCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  locale     String
+  key        String
+  value      String
+  createdAt  DateTime          @default(now()) @map("created_at")
+  updatedAt  DateTime          @updatedAt @map("updated_at")
+
+  @@unique([categoryId, locale, key])
+  @@index([categoryId, locale])
+  @@map("insurance_category_metadata")
+}
+
+model Insurance {
+  id         String              @id @default(uuid())
+  categoryId String              @map("category_id")
+  category   InsuranceCategory   @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  companyId  String              @map("company_id")
+  company    Company             @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  status     InsuranceStatus     @default(DRAFT)
+  
+  // Optional: Track who created/updated
+  createdBy  String?             @map("created_by")
+  updatedBy  String?             @map("updated_by")
+  
+  // Optional: Featured/priority
+  featured   Boolean             @default(false)
+  priority   Int                 @default(0)
+  
+  // Optional: SEO
+  slug       String?             @unique
+  
+  createdAt  DateTime            @default(now()) @map("created_at")
+  updatedAt  DateTime            @updatedAt @map("updated_at")
+  
+  metadata   InsuranceMetadata[]
+  content    InsuranceContent[]
+  tags       InsuranceTag[]
+
+  @@index([categoryId, status])
+  @@index([companyId, status])
+  @@index([status, featured, priority])
+  @@index([slug])
+  @@map("insurances")
+}
+
+model InsuranceMetadata {
+  id          String    @id @default(uuid())
+  insuranceId String    @map("insurance_id")
+  insurance   Insurance @relation(fields: [insuranceId], references: [id], onDelete: Cascade)
+  locale      String
+  key         String
+  value       String
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@unique([insuranceId, locale, key])
+  @@index([insuranceId, locale])
+  @@map("insurance_metadata")
+}
+
+model InsuranceContent {
+  id          String    @id @default(uuid())
+  insuranceId String    @map("insurance_id")
+  insurance   Insurance @relation(fields: [insuranceId], references: [id], onDelete: Cascade)
+  locale      String
+  
+  // TipTap content in multiple formats
+  contentJson Json      @map("content_json")
+  contentHtml String?   @map("content_html") @db.Text
+  contentText String?   @map("content_text") @db.Text
+  
+  // Media
+  images      String[]
+  
+  // Optional: Version control
+  version     Int       @default(1)
+  isPublished Boolean   @default(false) @map("is_published")
+  publishedAt DateTime? @map("published_at")
+  
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@unique([insuranceId, locale])
+  @@index([insuranceId, locale, isPublished])
+  @@map("insurance_content")
+}
+
+// Optional: Tags for better categorization
+model Tag {
+  id         String         @id @default(uuid())
+  name       String         @unique
+  slug       String         @unique
+  createdAt  DateTime       @default(now()) @map("created_at")
+  updatedAt  DateTime       @updatedAt @map("updated_at")
+  insurances InsuranceTag[]
+
+  @@index([slug])
+  @@map("tags")
+}
+
+model InsuranceTag {
+  insuranceId String    @map("insurance_id")
+  insurance   Insurance @relation(fields: [insuranceId], references: [id], onDelete: Cascade)
+  tagId       String    @map("tag_id")
+  tag         Tag       @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  @@id([insuranceId, tagId])
+  @@index([insuranceId])
+  @@index([tagId])
+  @@map("insurance_tags")
+}
+
+model Setting {
+  id        String   @id @default(uuid())
+  key       String
+  value     String   @db.Text
+  locale    String   @default("en")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([key, locale])
+  @@index([key, locale])
+  @@map("settings")
+}

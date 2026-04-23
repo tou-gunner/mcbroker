@@ -1,0 +1,20 @@
+{
+  "home": {
+    "title": "ຍິນດີຕ້ອນຮັບ",
+    "description": "ນີ້ແມ່ນໜ້າຫຼັກ"
+  },
+  "hero": {
+    "title": "MC Broker",
+    "subtitle": "ຄູ່ຮ່ວມງານປະກັນໄພທີ່ທ່ານໄວ້ວາງໃຈ"
+  },
+  "navigation": {
+    "home": "ໜ້າຫຼັກ",
+    "about": "ກ່ຽວກັບ",
+    "services": "ບໍລິການ",
+    "contact": "ຕິດຕໍ່"
+  },
+  "footer": {
+    "copyright": "ສະຫງວນລິຂະສິດ"
+  }
+}
+

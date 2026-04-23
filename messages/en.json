@@ -1,0 +1,20 @@
+{
+  "home": {
+    "title": "Welcome",
+    "description": "This is the home page"
+  },
+  "hero": {
+    "title": "MC Broker",
+    "subtitle": "Your Trusted Insurance Partner"
+  },
+  "navigation": {
+    "home": "Home",
+    "about": "About",
+    "services": "Services",
+    "contact": "Contact"
+  },
+  "footer": {
+    "copyright": "All rights reserved"
+  }
+}
+

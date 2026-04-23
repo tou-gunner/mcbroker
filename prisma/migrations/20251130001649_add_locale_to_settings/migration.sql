@@ -1,0 +1,17 @@
+-- CreateTable
+CREATE TABLE "settings" (
+    "id" TEXT NOT NULL,
+    "key" TEXT NOT NULL,
+    "value" TEXT NOT NULL,
+    "locale" TEXT NOT NULL DEFAULT 'en',
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "settings_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE INDEX "settings_key_locale_idx" ON "settings"("key", "locale");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "settings_key_locale_key" ON "settings"("key", "locale");
