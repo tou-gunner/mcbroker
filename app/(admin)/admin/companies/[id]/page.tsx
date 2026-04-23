@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
-import { MdSave, MdArrowBack, MdDelete } from 'react-icons/md';
+import { MdSave, MdArrowBack, MdDelete, MdDeleteForever } from 'react-icons/md';
 import { toast } from 'sonner';
 import ImageUpload from '../../components/ImageUpload';
 import { useConfirm } from '../../components/DialogProvider';
@@ -233,6 +233,43 @@ export default function CompanyEditorPage() {
     }
   };
 
+  const handleHardDelete = async () => {
+    if (!company) return;
+    if (company.insuranceCount > 0) {
+      toast.error(
+        `Cannot delete: ${company.insuranceCount} linked insurance${
+          company.insuranceCount === 1 ? '' : 's'
+        }. Remove them first.`
+      );
+      return;
+    }
+
+    const ok = await confirm({
+      title: 'Delete this company permanently?',
+      description:
+        'This cannot be undone. The company, its metadata, and its logo file will be removed. Prefer Archive if you want to hide it temporarily.',
+      variant: 'danger',
+      confirmLabel: 'Delete permanently',
+    });
+    if (!ok) return;
+
+    try {
+      const res = await fetch(`/api/admin/companies/${companyId}`, {
+        method: 'DELETE',
+      });
+      const result = await res.json();
+      if (result.success) {
+        toast.success('Company deleted');
+        router.push('/admin/companies');
+      } else {
+        toast.error(`Failed: ${result.error}`);
+      }
+    } catch (error) {
+      console.error('Error deleting company:', error);
+      toast.error('Error deleting company');
+    }
+  };
+
   const handleToggleActive = async () => {
     const nextState = !formData.isActive;
     const ok = await confirm({
@@ -301,6 +338,16 @@ export default function CompanyEditorPage() {
         </div>
 
         <div className="flex items-center space-x-3">
+          {isEdit && company && company.insuranceCount === 0 && (
+            <button
+              onClick={handleHardDelete}
+              className="flex items-center space-x-2 px-4 py-2 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 transition-colors"
+              title="Delete permanently"
+            >
+              <MdDeleteForever className="w-5 h-5" />
+              <span>Delete</span>
+            </button>
+          )}
           {isEdit && (
             <button
               onClick={handleToggleActive}

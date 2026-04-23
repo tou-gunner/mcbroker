@@ -8,6 +8,7 @@ import {
   MdEdit,
   MdArchive,
   MdUnarchive,
+  MdDeleteForever,
   MdSearch,
   MdFilterList,
 } from 'react-icons/md';
@@ -58,6 +59,42 @@ export default function CompanyListPage() {
   useEffect(() => {
     fetchCompanies();
   }, [fetchCompanies]);
+
+  const handleHardDelete = async (company: Company) => {
+    if (company.insuranceCount > 0) {
+      toast.error(
+        `Cannot delete: ${company.insuranceCount} linked insurance${
+          company.insuranceCount === 1 ? '' : 's'
+        }.`
+      );
+      return;
+    }
+
+    const ok = await confirm({
+      title: `Delete "${company.name}" permanently?`,
+      description:
+        'This cannot be undone. The company, its metadata, and its logo file will be removed.',
+      variant: 'danger',
+      confirmLabel: 'Delete permanently',
+    });
+    if (!ok) return;
+
+    try {
+      const res = await fetch(`/api/admin/companies/${company.id}`, {
+        method: 'DELETE',
+      });
+      const result = await res.json();
+      if (result.success) {
+        toast.success('Company deleted');
+        fetchCompanies();
+      } else {
+        toast.error(`Failed: ${result.error}`);
+      }
+    } catch (error) {
+      console.error('Error deleting company:', error);
+      toast.error('Error deleting company');
+    }
+  };
 
   const handleToggleActive = async (company: Company) => {
     const nextState = !company.isActive;
@@ -158,6 +195,15 @@ export default function CompanyListPage() {
               <MdUnarchive className="w-4 h-4" />
             )}
           </button>
+          {c.insuranceCount === 0 && (
+            <button
+              onClick={() => handleHardDelete(c)}
+              className="p-1.5 text-red-700 hover:bg-red-50 rounded transition-colors"
+              title="Delete permanently"
+            >
+              <MdDeleteForever className="w-4 h-4" />
+            </button>
+          )}
         </div>
       ),
     },

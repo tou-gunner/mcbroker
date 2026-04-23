@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/app/lib/prisma';
 import { getSessionAdmin } from '@/app/lib/session';
+import { deleteObjects, keyFromPublicUrl } from '@/app/lib/s3';
 
 // GET /api/admin/companies/[id] - Get single company with all-locale metadata
 export async function GET(
@@ -189,6 +190,60 @@ export async function PATCH(
       {
         success: false,
         error: 'Failed to update company',
+        message: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 }
+    );
+  }
+}
+
+// DELETE /api/admin/companies/[id] - Hard delete; blocked if insurances linked
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+
+    const company = await prisma.company.findUnique({
+      where: { id },
+      include: { _count: { select: { insurances: true } } },
+    });
+    if (!company) {
+      return NextResponse.json(
+        { success: false, error: 'Company not found' },
+        { status: 404 }
+      );
+    }
+
+    if (company._count.insurances > 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Company has ${company._count.insurances} linked insurance${
+            company._count.insurances === 1 ? '' : 's'
+          }. Remove them first.`,
+        },
+        { status: 409 }
+      );
+    }
+
+    if (company.logo) {
+      const key = keyFromPublicUrl(company.logo);
+      if (key && key.startsWith('companies/')) {
+        await deleteObjects([key]);
+      }
+    }
+
+    await prisma.company.delete({ where: { id } });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting company:', error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'Failed to delete company',
         message: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
