@@ -174,7 +174,7 @@ export default function CustomerPage() {
           
           <button
             onClick={() => router.push('/admin/customer/create')}
-            className="flex items-center space-x-1.5 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm shadow-sm"
+            className="flex items-center space-x-1.5 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm shadow-sm"
           >
             <MdAdd className="w-4 h-4" />
             <span>ເພີ່ມລູກຄ້າ</span>
@@ -193,7 +193,7 @@ export default function CustomerPage() {
               placeholder="ຄົ້ນຫາລູກຄ້າ..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
             />
           </div>
 
@@ -203,7 +203,7 @@ export default function CustomerPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white"
+              className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent appearance-none bg-white"
             >
               <option value="ALL">ທຸກສະຖານະ</option>
               <option value="ACTIVE">ໃຊ້ງານ</option>
@@ -225,7 +225,7 @@ export default function CustomerPage() {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         {loading ? (
           <div className="p-12 text-center">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mx-auto"></div>
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto"></div>
             <p className="text-gray-600 mt-3 text-sm">ກຳລັງໂຫຼດຂໍ້ມູນ...</p>
           </div>
         ) : currentCustomers.length === 0 ? (
@@ -242,7 +242,7 @@ export default function CustomerPage() {
             {!searchTerm && statusFilter === 'ALL' && (
               <button
                 onClick={() => router.push('/admin/customer/create')}
-                className="inline-flex items-center space-x-1.5 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                className="inline-flex items-center space-x-1.5 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm"
               >
                 <MdAdd className="w-4 h-4" />
                 <span>ເພີ່ມລູກຄ້າ</span>
@@ -283,8 +283,8 @@ export default function CustomerPage() {
                     <tr key={customer.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-4 py-3 whitespace-nowrap">
                         <div className="flex items-center">
-                          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-2.5">
-                            <span className="text-blue-600 font-medium text-sm">
+                          <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center mr-2.5">
+                            <span className="text-primary font-medium text-sm">
                               {customer.name.charAt(0)}
                             </span>
                           </div>
@@ -341,7 +341,7 @@ export default function CustomerPage() {
                         <div className="flex items-center justify-end space-x-1.5">
                           <button
                             onClick={() => router.push(`/admin/customer/${customer.id}`)}
-                            className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                            className="p-1.5 text-primary hover:bg-primary/10 rounded transition-colors"
                             title="ແກ້ໄຂ"
                           >
                             <MdEdit className="w-4 h-4" />
@@ -355,7 +355,7 @@ export default function CustomerPage() {
                           </button>
                           <button
                             onClick={() => handleDelete(customer.id)}
-                            className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors"
+                            className="p-1.5 text-secondary hover:bg-secondary/10 rounded transition-colors"
                             title="ລຶບ"
                           >
                             <MdDelete className="w-4 h-4" />
@@ -398,7 +398,7 @@ export default function CustomerPage() {
                           onClick={() => setCurrentPage(page)}
                           className={`px-3 py-1.5 border rounded-md text-sm font-medium ${
                             currentPage === page
-                              ? 'bg-blue-600 text-white border-blue-600'
+                              ? 'bg-primary text-white border-primary'
                               : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                           }`}
                         >

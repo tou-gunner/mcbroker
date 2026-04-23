@@ -41,7 +41,7 @@ function LoginForm() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="w-full max-w-sm bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div className="flex items-center justify-center gap-2 mb-6">
-          <MdShield className="w-8 h-8 text-blue-600" />
+          <MdShield className="w-8 h-8 text-primary" />
           <span className="text-2xl font-bold text-gray-800">MC Admin</span>
         </div>
 
@@ -56,7 +56,7 @@ function LoginForm() {
                 autoComplete="username"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="you@example.com"
                 disabled={submitting}
               />
@@ -73,7 +73,7 @@ function LoginForm() {
                 autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="••••••••"
                 disabled={submitting}
               />
@@ -90,7 +90,7 @@ function LoginForm() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {submitting ? 'Signing in…' : 'Sign in'}
           </button>

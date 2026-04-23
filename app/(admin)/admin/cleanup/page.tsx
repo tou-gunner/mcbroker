@@ -115,7 +115,7 @@ export default function CleanupPage() {
   return (
     <div className="max-w-6xl">
       <div className="flex items-center gap-3 mb-4">
-        <MdCleaningServices className="w-7 h-7 text-blue-600" />
+        <MdCleaningServices className="w-7 h-7 text-primary" />
         <h1 className="text-2xl font-bold text-gray-800">Storage cleanup</h1>
       </div>
 
@@ -137,14 +137,14 @@ export default function CleanupPage() {
               step={1}
               value={minAgeHours}
               onChange={(e) => setMinAgeHours(Math.max(0, parseFloat(e.target.value) || 0))}
-              className="w-32 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-32 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
             />
             <p className="text-xs text-gray-500 mt-1">Skip objects uploaded within this window.</p>
           </div>
           <button
             onClick={scan}
             disabled={scanning}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <MdRefresh className={`w-5 h-5 ${scanning ? 'animate-spin' : ''}`} />
             {scanning ? 'Scanning…' : 'Scan'}
@@ -155,7 +155,7 @@ export default function CleanupPage() {
               onClick={() => setMinAgeHours(h)}
               className={`text-xs px-2 py-1 rounded border ${
                 minAgeHours === h
-                  ? 'border-blue-500 text-blue-600 bg-blue-50'
+                  ? 'border-primary text-primary bg-primary/10'
                   : 'border-gray-300 text-gray-600 hover:bg-gray-50'
               }`}
             >
@@ -187,7 +187,7 @@ export default function CleanupPage() {
               {selected.size > 0 && (
                 <>
                   {' · '}
-                  <span className="text-blue-600">
+                  <span className="text-primary">
                     {selected.size} selected ({formatBytes(selectedBytes)})
                   </span>
                 </>
@@ -196,7 +196,7 @@ export default function CleanupPage() {
             <button
               onClick={remove}
               disabled={deleting || selected.size === 0}
-              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-4 py-2 bg-secondary text-white rounded-lg hover:bg-secondary-dark disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <MdDelete className="w-5 h-5" />
               {deleting ? 'Deleting…' : `Delete selected (${selected.size})`}
@@ -229,7 +229,7 @@ export default function CleanupPage() {
                   <tr
                     key={o.key}
                     className={`border-t border-gray-100 hover:bg-gray-50 cursor-pointer ${
-                      selected.has(o.key) ? 'bg-blue-50' : ''
+                      selected.has(o.key) ? 'bg-primary/10' : ''
                     }`}
                     onClick={() => toggle(o.key)}
                   >
@@ -259,7 +259,7 @@ export default function CleanupPage() {
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={(e) => e.stopPropagation()}
-                        className="text-blue-600 hover:underline"
+                        className="text-primary hover:underline"
                       >
                         {o.key}
                       </a>

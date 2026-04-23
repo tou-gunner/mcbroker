@@ -234,7 +234,7 @@ export default function RichTextEditor({ content, onChange, editable = true }: R
           <button
             onClick={() => editor.chain().focus().toggleBold().run()}
             className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-              editor.isActive('bold') ? 'bg-blue-100 text-blue-600' : 'text-gray-700'
+              editor.isActive('bold') ? 'bg-primary/10 text-primary' : 'text-gray-700'
             }`}
             type="button"
             title="Bold (Ctrl+B)"
@@ -245,7 +245,7 @@ export default function RichTextEditor({ content, onChange, editable = true }: R
           <button
             onClick={() => editor.chain().focus().toggleItalic().run()}
             className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-              editor.isActive('italic') ? 'bg-blue-100 text-blue-600' : 'text-gray-700'
+              editor.isActive('italic') ? 'bg-primary/10 text-primary' : 'text-gray-700'
             }`}
             type="button"
             title="Italic (Ctrl+I)"
@@ -256,7 +256,7 @@ export default function RichTextEditor({ content, onChange, editable = true }: R
           <button
             onClick={() => editor.chain().focus().toggleCode().run()}
             className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-              editor.isActive('code') ? 'bg-blue-100 text-blue-600' : 'text-gray-700'
+              editor.isActive('code') ? 'bg-primary/10 text-primary' : 'text-gray-700'
             }`}
             type="button"
             title="Inline Code"
@@ -334,7 +334,7 @@ export default function RichTextEditor({ content, onChange, editable = true }: R
                 
                 <button
                   onClick={() => setShowColorPicker(false)}
-                  className="w-full px-2 py-1 text-xs mt-1 bg-blue-600 text-white hover:bg-blue-700 rounded transition-colors"
+                  className="w-full px-2 py-1 text-xs mt-1 bg-primary text-white hover:bg-primary-dark rounded transition-colors"
                   type="button"
                 >
                   Close
@@ -351,7 +351,7 @@ export default function RichTextEditor({ content, onChange, editable = true }: R
           <button
             onClick={() => editor.chain().focus().setTextAlign('left').run()}
             className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-              editor.isActive({ textAlign: 'left' }) ? 'bg-blue-100 text-blue-600' : 'text-gray-700'
+              editor.isActive({ textAlign: 'left' }) ? 'bg-primary/10 text-primary' : 'text-gray-700'
             }`}
             type="button"
             title="Align Left"
@@ -362,7 +362,7 @@ export default function RichTextEditor({ content, onChange, editable = true }: R
           <button
             onClick={() => editor.chain().focus().setTextAlign('center').run()}
             className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-              editor.isActive({ textAlign: 'center' }) ? 'bg-blue-100 text-blue-600' : 'text-gray-700'
+              editor.isActive({ textAlign: 'center' }) ? 'bg-primary/10 text-primary' : 'text-gray-700'
             }`}
             type="button"
             title="Align Center"
@@ -373,7 +373,7 @@ export default function RichTextEditor({ content, onChange, editable = true }: R
           <button
             onClick={() => editor.chain().focus().setTextAlign('right').run()}
             className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-              editor.isActive({ textAlign: 'right' }) ? 'bg-blue-100 text-blue-600' : 'text-gray-700'
+              editor.isActive({ textAlign: 'right' }) ? 'bg-primary/10 text-primary' : 'text-gray-700'
             }`}
             type="button"
             title="Align Right"
@@ -384,7 +384,7 @@ export default function RichTextEditor({ content, onChange, editable = true }: R
           <button
             onClick={() => editor.chain().focus().setTextAlign('justify').run()}
             className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-              editor.isActive({ textAlign: 'justify' }) ? 'bg-blue-100 text-blue-600' : 'text-gray-700'
+              editor.isActive({ textAlign: 'justify' }) ? 'bg-primary/10 text-primary' : 'text-gray-700'
             }`}
             type="button"
             title="Justify"
@@ -432,7 +432,7 @@ export default function RichTextEditor({ content, onChange, editable = true }: R
           <button
             onClick={() => editor.chain().focus().toggleBulletList().run()}
             className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-              editor.isActive('bulletList') ? 'bg-blue-100 text-blue-600' : 'text-gray-700'
+              editor.isActive('bulletList') ? 'bg-primary/10 text-primary' : 'text-gray-700'
             }`}
             type="button"
             title="Bullet List"
@@ -443,7 +443,7 @@ export default function RichTextEditor({ content, onChange, editable = true }: R
           <button
             onClick={() => editor.chain().focus().toggleOrderedList().run()}
             className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-              editor.isActive('orderedList') ? 'bg-blue-100 text-blue-600' : 'text-gray-700'
+              editor.isActive('orderedList') ? 'bg-primary/10 text-primary' : 'text-gray-700'
             }`}
             type="button"
             title="Numbered List"
@@ -454,7 +454,7 @@ export default function RichTextEditor({ content, onChange, editable = true }: R
           <button
             onClick={() => editor.chain().focus().toggleBlockquote().run()}
             className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-              editor.isActive('blockquote') ? 'bg-blue-100 text-blue-600' : 'text-gray-700'
+              editor.isActive('blockquote') ? 'bg-primary/10 text-primary' : 'text-gray-700'
             }`}
             type="button"
             title="Quote"
@@ -571,7 +571,7 @@ export default function RichTextEditor({ content, onChange, editable = true }: R
                   editor?.chain().focus().deleteColumn().run();
                   setContextMenu(null);
                 }}
-                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 text-red-600 transition-colors"
+                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 text-secondary transition-colors"
                 type="button"
               >
                 Delete Column
@@ -602,7 +602,7 @@ export default function RichTextEditor({ content, onChange, editable = true }: R
                   editor?.chain().focus().deleteRow().run();
                   setContextMenu(null);
                 }}
-                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 text-red-600 transition-colors"
+                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 text-secondary transition-colors"
                 type="button"
               >
                 Delete Row
@@ -613,7 +613,7 @@ export default function RichTextEditor({ content, onChange, editable = true }: R
                   editor?.chain().focus().deleteTable().run();
                   setContextMenu(null);
                 }}
-                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 text-red-600 transition-colors"
+                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 text-secondary transition-colors"
                 type="button"
               >
                 Delete Table

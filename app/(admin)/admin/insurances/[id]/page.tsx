@@ -302,7 +302,7 @@ export default function InsuranceEditorPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto"></div>
           <p className="text-gray-600 mt-4">Loading insurance...</p>
         </div>
       </div>
@@ -344,7 +344,7 @@ export default function InsuranceEditorPage() {
           <button
             onClick={() => handleSave('PUBLISHED')}
             disabled={saving}
-            className="flex items-center space-x-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+            className="flex items-center space-x-2 px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-50"
           >
             <MdPublish className="w-5 h-5" />
             <span>{saving ? 'Saving...' : 'Publish'}</span>
@@ -359,7 +359,7 @@ export default function InsuranceEditorPage() {
             onClick={() => setCurrentLocale('en')}
             className={`px-6 py-3 font-medium transition-colors ${
               currentLocale === 'en'
-                ? 'text-blue-600 border-b-2 border-blue-600'
+                ? 'text-primary border-b-2 border-primary'
                 : 'text-gray-600 hover:text-gray-900'
             }`}
           >
@@ -369,7 +369,7 @@ export default function InsuranceEditorPage() {
             onClick={() => setCurrentLocale('lo')}
             className={`px-6 py-3 font-medium transition-colors ${
               currentLocale === 'lo'
-                ? 'text-blue-600 border-b-2 border-blue-600'
+                ? 'text-primary border-b-2 border-primary'
                 : 'text-gray-600 hover:text-gray-900'
             }`}
           >
@@ -393,7 +393,7 @@ export default function InsuranceEditorPage() {
                   required
                   value={getCurrentMetadata().name}
                   onChange={(e) => updateMetadata(currentLocale, 'name', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                   placeholder="e.g., Comprehensive Health Insurance"
                 />
               </div>
@@ -408,7 +408,7 @@ export default function InsuranceEditorPage() {
                     required
                     value={formData.categoryId}
                     onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                   >
                     <option value="">Select Category</option>
                     {categories.map(cat => (
@@ -439,7 +439,7 @@ export default function InsuranceEditorPage() {
                     required
                     value={formData.companyId}
                     onChange={(e) => setFormData({ ...formData, companyId: e.target.value })}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                   >
                     <option value="">Select Company</option>
                     {companies.map(company => (
@@ -470,7 +470,7 @@ export default function InsuranceEditorPage() {
                     type="text"
                     value={formData.slug}
                     onChange={(e) => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                     placeholder="auto-generated-from-name"
                   />
                 </div>
@@ -486,7 +486,7 @@ export default function InsuranceEditorPage() {
                     type="number"
                     value={formData.priority}
                     onChange={(e) => setFormData({ ...formData, priority: parseInt(e.target.value) })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                     min="0"
                   />
                   <p className="text-sm text-gray-500 mt-1">Higher numbers appear first</p>
@@ -501,7 +501,7 @@ export default function InsuranceEditorPage() {
                       type="checkbox"
                       checked={formData.featured}
                       onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
-                      className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      className="w-5 h-5 text-primary border-gray-300 rounded focus:ring-primary"
                     />
                     <span className="text-sm font-medium text-gray-700">
                       Feature this insurance (will be highlighted on homepage)
@@ -520,7 +520,7 @@ export default function InsuranceEditorPage() {
                   value={getCurrentMetadata().description}
                   onChange={(e) => updateMetadata(currentLocale, 'description', e.target.value)}
                   rows={3}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                   placeholder="Brief description that will appear in listings..."
                 />
               </div>
@@ -564,7 +564,7 @@ export default function InsuranceEditorPage() {
                   // Auto-generate slug
                   setNewCategorySlug(e.target.value.toLowerCase().replace(/\s+/g, '-'));
                 }}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 placeholder="e.g., Health Insurance"
               />
             </div>
@@ -577,7 +577,7 @@ export default function InsuranceEditorPage() {
                 type="text"
                 value={newCategorySlug}
                 onChange={(e) => setNewCategorySlug(e.target.value.toLowerCase().replace(/\s+/g, '-'))}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 placeholder="health-insurance"
               />
             </div>
@@ -624,7 +624,7 @@ export default function InsuranceEditorPage() {
                   // Auto-generate slug
                   setNewCompanySlug(e.target.value.toLowerCase().replace(/\s+/g, '-'));
                 }}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 placeholder="e.g., Allianz Insurance"
               />
             </div>
@@ -637,7 +637,7 @@ export default function InsuranceEditorPage() {
                 type="text"
                 value={newCompanySlug}
                 onChange={(e) => setNewCompanySlug(e.target.value.toLowerCase().replace(/\s+/g, '-'))}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 placeholder="allianz-insurance"
               />
             </div>
@@ -688,7 +688,7 @@ export default function InsuranceEditorPage() {
           <button
             onClick={() => handleSave('PUBLISHED')}
             disabled={saving}
-            className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+            className="flex items-center space-x-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-50"
           >
             <MdSave className="w-5 h-5" />
             <span>{saving ? 'Saving...' : 'Save & Publish'}</span>

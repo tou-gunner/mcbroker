@@ -124,7 +124,7 @@ export default function InsuranceListPage() {
         
         <button
           onClick={() => router.push('/admin/insurances/create')}
-          className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+          className="flex items-center space-x-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors shadow-sm"
         >
           <MdAdd className="w-5 h-5" />
           <span>Create Insurance</span>
@@ -142,7 +142,7 @@ export default function InsuranceListPage() {
               placeholder="Search insurances..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
             />
           </div>
 
@@ -152,7 +152,7 @@ export default function InsuranceListPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent appearance-none bg-white"
             >
               <option value="ALL">All Status</option>
               <option value="DRAFT">Draft</option>
@@ -174,7 +174,7 @@ export default function InsuranceListPage() {
       {/* Table */}
       {loading ? (
             <div className="p-12 text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
             <p className="text-gray-600 mt-4">Loading items...</p>
             </div>
         ) : (

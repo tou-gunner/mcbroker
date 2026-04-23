@@ -44,7 +44,7 @@ export default function DataTable({ items, onCreate, actions, columns, searchKey
             {!searchTerm && onCreate && (
                 <button
                 onClick={onCreate}
-                className="inline-flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center space-x-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
                 >
                 <MdAdd className="w-5 h-5" />
                     <span>Create</span>

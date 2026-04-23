@@ -5,14 +5,18 @@
   --foreground: #858585;
 
   --primary: #1371AF;
+  --primary-dark: #0F5A8A;
   --secondary: #FF0000;
+  --secondary-dark: #CC0000;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
   --color-secondary: var(--secondary);
+  --color-secondary-dark: var(--secondary-dark);
   --font-sans: var(--font-phetsarath);
 }
 

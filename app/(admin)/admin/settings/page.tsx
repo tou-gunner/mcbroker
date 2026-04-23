@@ -100,7 +100,7 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -122,10 +122,10 @@ export default function SettingsPage() {
 
       {/* Hero Section Settings */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+        <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-primary/10 to-primary/5">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <MdImage className="w-5 h-5 text-blue-600" />
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <MdImage className="w-5 h-5 text-primary" />
             </div>
             <div>
               <h2 className="text-lg font-semibold text-gray-800">Hero Section</h2>
@@ -151,7 +151,7 @@ export default function SettingsPage() {
                   type="text"
                   value={settings.hero_title.en}
                   onChange={(e) => handleChange('hero_title', 'en', e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
                   placeholder="Enter hero title in English"
                 />
               </div>
@@ -163,7 +163,7 @@ export default function SettingsPage() {
                   type="text"
                   value={settings.hero_title.lo}
                   onChange={(e) => handleChange('hero_title', 'lo', e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
                   placeholder="ປ້ອນຫົວຂໍ້ເປັນພາສາລາວ"
                 />
               </div>
@@ -186,7 +186,7 @@ export default function SettingsPage() {
                   value={settings.hero_subtitle.en}
                   onChange={(e) => handleChange('hero_subtitle', 'en', e.target.value)}
                   rows={3}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors resize-none"
                   placeholder="Enter hero subtitle in English"
                 />
               </div>
@@ -198,7 +198,7 @@ export default function SettingsPage() {
                   value={settings.hero_subtitle.lo}
                   onChange={(e) => handleChange('hero_subtitle', 'lo', e.target.value)}
                   rows={3}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors resize-none"
                   placeholder="ປ້ອນຄຳອະທິບາຍເປັນພາສາລາວ"
                 />
               </div>
@@ -237,7 +237,7 @@ export default function SettingsPage() {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-6 py-2.5 bg-primary hover:bg-primary-dark text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {saving ? (
               <>
