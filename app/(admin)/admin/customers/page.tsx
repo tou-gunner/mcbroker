@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { 
-  MdAdd, 
-  MdEdit, 
-  MdDelete, 
+import {
+  MdAdd,
+  MdEdit,
+  MdDelete,
   MdVisibility,
   MdSearch,
   MdFilterList,
@@ -14,6 +14,8 @@ import {
   MdPerson,
   MdDownload
 } from 'react-icons/md';
+import { toast } from 'sonner';
+import { useConfirm } from '../components/DialogProvider';
 
 interface Customer {
   id: string;
@@ -32,6 +34,7 @@ interface Customer {
 
 export default function CustomerPage() {
   const router = useRouter();
+  const confirm = useConfirm();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -101,9 +104,12 @@ export default function CustomerPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບລູກຄ້ານີ້?')) {
-      return;
-    }
+    const ok = await confirm({
+      title: 'ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບລູກຄ້ານີ້?',
+      variant: 'danger',
+      confirmLabel: 'Delete',
+    });
+    if (!ok) return;
 
     try {
       // TODO: Implement delete API
@@ -116,7 +122,7 @@ export default function CustomerPage() {
 
   const handleExport = () => {
     // TODO: Implement export functionality
-    alert('Export functionality coming soon');
+    toast.info('Export functionality coming soon');
   };
 
   const filteredCustomers = customers.filter(customer => {

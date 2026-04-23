@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { MdSave, MdArrowBack, MdPublish, MdDrafts, MdPreview, MdAdd } from 'react-icons/md';
+import { toast } from 'sonner';
 
 // Import editor dynamically to avoid SSR issues
 const RichTextEditor = dynamic(() => import('../../components/RichTextEditor'), {
@@ -97,7 +98,7 @@ export default function InsuranceEditorPage() {
       }
     } catch (error) {
       console.error('Error fetching data:', error);
-      alert('Failed to load companies and categories');
+      toast.error('Failed to load companies and categories');
     }
   };
 
@@ -148,12 +149,12 @@ export default function InsuranceEditorPage() {
           ]
         });
       } else {
-        alert('Failed to load insurance data');
+        toast.error('Failed to load insurance data');
         router.push('/admin/insurances');
       }
     } catch (error) {
       console.error('Error fetching insurance:', error);
-      alert('Error loading insurance data');
+      toast.error('Error loading insurance data');
       router.push('/admin/insurances');
     } finally {
       setLoading(false);
@@ -180,14 +181,14 @@ export default function InsuranceEditorPage() {
       const result = await response.json();
 
       if (result.success) {
-        alert(`Insurance ${isEdit ? 'updated' : 'created'} successfully!`);
+        toast.success(`Insurance ${isEdit ? 'updated' : 'created'} successfully`);
         router.push('/admin/insurances');
       } else {
-        alert(`Failed to save insurance: ${result.error || 'Unknown error'}`);
+        toast.error(`Failed to save insurance: ${result.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Error saving insurance:', error);
-      alert('Failed to save insurance. Please try again.');
+      toast.error('Failed to save insurance. Please try again.');
     } finally {
       setSaving(false);
     }
@@ -226,7 +227,7 @@ export default function InsuranceEditorPage() {
 
   const handleCreateCategory = async () => {
     if (!newCategoryName.trim()) {
-      alert('Please enter a category name');
+      toast.error('Please enter a category name');
       return;
     }
 
@@ -246,24 +247,23 @@ export default function InsuranceEditorPage() {
       const result = await response.json();
 
       if (result.success) {
-        alert('Category created successfully!');
+        toast.success('Category created successfully');
         setShowNewCategoryModal(false);
         setNewCategoryName('');
         setNewCategorySlug('');
-        // Refresh categories
         fetchData();
       } else {
-        alert(`Failed to create category: ${result.error}`);
+        toast.error(`Failed to create category: ${result.error}`);
       }
     } catch (error) {
       console.error('Error creating category:', error);
-      alert('Error creating category');
+      toast.error('Error creating category');
     }
   };
 
   const handleCreateCompany = async () => {
     if (!newCompanyName.trim()) {
-      alert('Please enter a company name');
+      toast.error('Please enter a company name');
       return;
     }
 
@@ -283,18 +283,17 @@ export default function InsuranceEditorPage() {
       const result = await response.json();
 
       if (result.success) {
-        alert('Company created successfully!');
+        toast.success('Company created successfully');
         setShowNewCompanyModal(false);
         setNewCompanyName('');
         setNewCompanySlug('');
-        // Refresh companies
         fetchData();
       } else {
-        alert(`Failed to create company: ${result.error}`);
+        toast.error(`Failed to create company: ${result.error}`);
       }
     } catch (error) {
       console.error('Error creating company:', error);
-      alert('Error creating company');
+      toast.error('Error creating company');
     }
   };
 
@@ -548,7 +547,7 @@ export default function InsuranceEditorPage() {
 
       {/* New Category Modal */}
       {showNewCategoryModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg max-w-md w-full p-6 space-y-4">
             <h3 className="text-xl font-bold text-gray-900">Create New Category</h3>
             
@@ -608,7 +607,7 @@ export default function InsuranceEditorPage() {
 
       {/* New Company Modal */}
       {showNewCompanyModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg max-w-md w-full p-6 space-y-4">
             <h3 className="text-xl font-bold text-gray-900">Create New Company</h3>
             

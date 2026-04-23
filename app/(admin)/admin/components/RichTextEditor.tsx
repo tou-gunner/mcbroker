@@ -13,6 +13,8 @@ import { Gapcursor } from '@tiptap/extension-gapcursor';
 import { Dropcursor } from '@tiptap/extension-dropcursor';
 import { TextAlign } from '@tiptap/extension-text-align';
 import React, { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import { usePrompt } from './DialogProvider';
 import { 
   MdFormatBold, 
   MdFormatItalic, 
@@ -40,6 +42,7 @@ interface RichTextEditorProps {
 }
 
 export default function RichTextEditor({ content, onChange, editable = true }: RichTextEditorProps) {
+  const prompt = usePrompt();
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [currentColor, setCurrentColor] = useState('#000000');
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
@@ -174,50 +177,76 @@ export default function RichTextEditor({ content, onChange, editable = true }: R
 
       editor.chain().focus().setImage({ src: json.url }).run();
     } catch (err) {
-      alert(`Image upload failed: ${err instanceof Error ? err.message : String(err)}`);
+      toast.error(`Image upload failed: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
       setUploadingImage(false);
       if (imageInputRef.current) imageInputRef.current.value = '';
     }
   };
 
-  const addTable = () => {
-    const rows = window.prompt('Number of rows:', '3');
-    const cols = window.prompt('Number of columns:', '3');
-    
-    if (rows && cols) {
-      const rowCount = parseInt(rows);
-      const colCount = parseInt(cols);
-      
-      if (rowCount > 0 && colCount > 0) {
-        try {
-          editor?.chain().focus().insertTable({ rows: rowCount, cols: colCount, withHeaderRow: true }).run();
-          console.log('Table inserted successfully');
-        } catch (error) {
-          console.error('Error inserting table:', error);
-        }
-      }
+  const validatePositiveInt = (v: string) => {
+    const n = parseInt(v, 10);
+    return Number.isInteger(n) && n > 0 ? null : 'Enter a positive whole number';
+  };
+
+  const addTable = async () => {
+    const rows = await prompt({
+      title: 'Insert table',
+      label: 'Number of rows',
+      defaultValue: '3',
+      inputType: 'number',
+      validate: validatePositiveInt,
+    });
+    if (rows === null) return;
+
+    const cols = await prompt({
+      title: 'Insert table',
+      label: 'Number of columns',
+      defaultValue: '3',
+      inputType: 'number',
+      validate: validatePositiveInt,
+    });
+    if (cols === null) return;
+
+    try {
+      editor
+        ?.chain()
+        .focus()
+        .insertTable({
+          rows: parseInt(rows, 10),
+          cols: parseInt(cols, 10),
+          withHeaderRow: true,
+        })
+        .run();
+    } catch (error) {
+      console.error('Error inserting table:', error);
+      toast.error('Error inserting table');
     }
   };
 
-  const setColumnWidth = () => {
-    const width = window.prompt('Enter column width (e.g., 100px, 20%, auto):', '100px');
-    if (width) {
-      editor?.chain().focus().setCellAttribute('colwidth', [parseInt(width)]).run();
-    }
+  const setColumnWidth = async () => {
+    const width = await prompt({
+      title: 'Column width',
+      label: 'Width (e.g. 100px, 20%, auto)',
+      defaultValue: '100px',
+    });
+    if (width === null || !width) return;
+    editor?.chain().focus().setCellAttribute('colwidth', [parseInt(width)]).run();
   };
 
-  const setTableWidth = () => {
-    const width = window.prompt('Enter table width (e.g., 100%, 800px):', '100%');
-    if (width) {
-      // Update table width via custom command
-      const { state } = editor!;
-      const { selection } = state;
-      const table = selection.$anchor.node(-1);
-      
-      if (table && table.type.name === 'table') {
-        editor?.chain().focus().updateAttributes('table', { width }).run();
-      }
+  const setTableWidth = async () => {
+    const width = await prompt({
+      title: 'Table width',
+      label: 'Width (e.g. 100%, 800px)',
+      defaultValue: '100%',
+    });
+    if (width === null || !width) return;
+    const { state } = editor!;
+    const { selection } = state;
+    const table = selection.$anchor.node(-1);
+
+    if (table && table.type.name === 'table') {
+      editor?.chain().focus().updateAttributes('table', { width }).run();
     }
   };
 

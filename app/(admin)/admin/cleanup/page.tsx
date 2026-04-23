@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from 'react';
 import { MdCleaningServices, MdRefresh, MdDelete, MdWarning } from 'react-icons/md';
+import { toast } from 'sonner';
+import { useConfirm } from '../components/DialogProvider';
 
 type Orphan = {
   key: string;
@@ -30,13 +32,13 @@ function formatDate(iso: string): string {
 }
 
 export default function CleanupPage() {
+  const confirm = useConfirm();
   const [minAgeHours, setMinAgeHours] = useState<number>(24);
   const [scanning, setScanning] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [result, setResult] = useState<ScanResponse | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
-  const [toast, setToast] = useState<string | null>(null);
 
   const allSelected = useMemo(() => {
     return !!result && result.orphans.length > 0 && selected.size === result.orphans.length;
@@ -50,7 +52,6 @@ export default function CleanupPage() {
   const scan = async () => {
     setScanning(true);
     setError(null);
-    setToast(null);
     setSelected(new Set());
     try {
       const res = await fetch(`/api/admin/cleanup/orphans?minAgeHours=${minAgeHours}`);
@@ -82,13 +83,16 @@ export default function CleanupPage() {
   const remove = async () => {
     if (selected.size === 0) return;
     const count = selected.size;
-    if (!window.confirm(`Permanently delete ${count} object${count === 1 ? '' : 's'} (${formatBytes(selectedBytes)}) from MinIO? This cannot be undone.`)) {
-      return;
-    }
+    const ok = await confirm({
+      title: `Permanently delete ${count} object${count === 1 ? '' : 's'}?`,
+      description: `${formatBytes(selectedBytes)} will be removed from MinIO. This cannot be undone.`,
+      variant: 'danger',
+      confirmLabel: 'Delete',
+    });
+    if (!ok) return;
 
     setDeleting(true);
     setError(null);
-    setToast(null);
     try {
       const res = await fetch('/api/admin/cleanup/orphans', {
         method: 'DELETE',
@@ -97,7 +101,7 @@ export default function CleanupPage() {
       });
       const json = await res.json();
       if (!res.ok || !json.success) throw new Error(json.error || 'delete failed');
-      setToast(
+      toast.success(
         `Deleted ${json.deleted} object${json.deleted === 1 ? '' : 's'}` +
           (json.skippedNowReferenced?.length
             ? `; skipped ${json.skippedNowReferenced.length} now-referenced`
@@ -169,12 +173,6 @@ export default function CleanupPage() {
         <div className="flex items-start gap-2 bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 mb-4">
           <MdWarning className="w-5 h-5 mt-0.5 flex-shrink-0" />
           <span className="text-sm">{error}</span>
-        </div>
-      )}
-
-      {toast && (
-        <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 mb-4 text-sm">
-          {toast}
         </div>
       )}
 

@@ -3,6 +3,8 @@
 import "../../globals.css";
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
+import { Toaster } from 'sonner';
+import { DialogProvider } from './components/DialogProvider';
 import {
   MdDashboard,
   MdDescription,
@@ -67,13 +69,17 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   if (isLoginPage) {
     return (
       <html>
-        <body>{children}</body>
+        <body>
+          {children}
+          <Toaster richColors position="top-right" />
+        </body>
       </html>
     );
   }
 
   return (<html>
     <body>
+      <DialogProvider>
       <div className="min-h-screen bg-gray-50">
         {/* Sidebar */}
         <aside
@@ -191,11 +197,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         {/* Mobile Overlay */}
         {sidebarOpen && (
           <div
-            className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
+            className="fixed inset-0 bg-black/50 z-30 lg:hidden"
             onClick={() => setSidebarOpen(false)}
           ></div>
         )}
       </div>
+      <Toaster richColors position="top-right" />
+      </DialogProvider>
     </body>
   </html>);
 }

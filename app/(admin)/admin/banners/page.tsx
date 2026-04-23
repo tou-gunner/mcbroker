@@ -3,7 +3,9 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { MdDelete, MdSave } from 'react-icons/md';
+import { toast } from 'sonner';
 import ImageUpload from '../components/ImageUpload';
+import { useConfirm } from '../components/DialogProvider';
 
 interface Banner {
   id: string;
@@ -22,6 +24,7 @@ interface DraftFields {
 }
 
 export default function BannersPage() {
+  const confirm = useConfirm();
   const [banners, setBanners] = useState<Banner[]>([]);
   const [drafts, setDrafts] = useState<Record<string, DraftFields>>({});
   const [loading, setLoading] = useState(true);
@@ -64,12 +67,13 @@ export default function BannersPage() {
       const result = await res.json();
       if (result.success) {
         fetchBanners();
+        toast.success('Banner uploaded');
       } else {
-        alert(`Failed to create banner: ${result.error}`);
+        toast.error(`Failed to create banner: ${result.error}`);
       }
     } catch (error) {
       console.error('Error creating banner:', error);
-      alert('Error creating banner');
+      toast.error('Error creating banner');
     }
   };
 
@@ -90,30 +94,38 @@ export default function BannersPage() {
       const result = await res.json();
       if (result.success) {
         setBanners((prev) => prev.map((b) => (b.id === id ? result.data : b)));
+        toast.success('Banner saved');
       } else {
-        alert(`Failed to save: ${result.error}`);
+        toast.error(`Failed to save: ${result.error}`);
       }
     } catch (error) {
       console.error('Error saving banner:', error);
-      alert('Error saving banner');
+      toast.error('Error saving banner');
     } finally {
       setSavingId(null);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Delete this banner?')) return;
+    const ok = await confirm({
+      title: 'Delete banner?',
+      description: 'This banner will be removed from the hero carousel immediately.',
+      variant: 'danger',
+      confirmLabel: 'Delete',
+    });
+    if (!ok) return;
     try {
       const res = await fetch(`/api/admin/banners/${id}`, { method: 'DELETE' });
       const result = await res.json();
       if (result.success) {
         setBanners((prev) => prev.filter((b) => b.id !== id));
+        toast.success('Banner deleted');
       } else {
-        alert(`Failed to delete: ${result.error}`);
+        toast.error(`Failed to delete: ${result.error}`);
       }
     } catch (error) {
       console.error('Error deleting banner:', error);
-      alert('Error deleting banner');
+      toast.error('Error deleting banner');
     }
   };
 
@@ -172,7 +184,7 @@ export default function BannersPage() {
                 key={banner.id}
                 className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex flex-col"
               >
-                <div className="relative w-full aspect-[16/9] bg-gray-100">
+                <div className="relative w-full aspect-video bg-gray-100">
                   <Image
                     src={banner.imageUrl}
                     alt="Banner"

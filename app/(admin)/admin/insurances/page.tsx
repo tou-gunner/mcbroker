@@ -10,7 +10,9 @@ import {
   MdSearch,
   MdFilterList
 } from 'react-icons/md';
+import { toast } from 'sonner';
 import DataTable, { DataColumn } from '../components/DataTable';
+import { useConfirm } from '../components/DialogProvider';
 
 interface Insurance {
   id: string;
@@ -34,6 +36,7 @@ interface Insurance {
 
 export default function InsuranceListPage() {
   const router = useRouter();
+  const confirm = useConfirm();
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [searchTerm, setSearchTerm] = useState('');
@@ -90,26 +93,30 @@ export default function InsuranceListPage() {
   });
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this insurance?')) {
-      return;
-    }
+    const ok = await confirm({
+      title: 'Delete insurance?',
+      description: 'This action cannot be undone.',
+      variant: 'danger',
+      confirmLabel: 'Delete',
+    });
+    if (!ok) return;
 
     try {
-      const response = await fetch(`/api/admin/insurances/${id}`, { 
-        method: 'DELETE' 
+      const response = await fetch(`/api/admin/insurances/${id}`, {
+        method: 'DELETE',
       });
-      
+
       const result = await response.json();
-      
+
       if (result.success) {
-        alert('Insurance deleted successfully');
-      fetchInsurances();
+        toast.success('Insurance deleted successfully');
+        fetchInsurances();
       } else {
-        alert(`Failed to delete: ${result.error}`);
+        toast.error(`Failed to delete: ${result.error}`);
       }
     } catch (error) {
       console.error('Error deleting insurance:', error);
-      alert('Error deleting insurance');
+      toast.error('Error deleting insurance');
     }
   };
 
