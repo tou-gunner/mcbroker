@@ -43,7 +43,9 @@ export default function RichTextEditor({ content, onChange, editable = true }: R
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [currentColor, setCurrentColor] = useState('#000000');
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const savedSelectionRef = React.useRef<any>(null);
+  const imageInputRef = React.useRef<HTMLInputElement>(null);
 
   const editor = useEditor({
     extensions: [
@@ -153,9 +155,29 @@ export default function RichTextEditor({ content, onChange, editable = true }: R
   }
 
   const addImage = () => {
-    const url = window.prompt('Enter image URL:');
-    if (url) {
-      editor.chain().focus().setImage({ src: url }).run();
+    imageInputRef.current?.click();
+  };
+
+  const handleImagePick = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      form.append('scope', 'insurance-content');
+
+      const res = await fetch('/api/admin/upload', { method: 'POST', body: form });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'upload failed');
+
+      editor.chain().focus().setImage({ src: json.url }).run();
+    } catch (err) {
+      alert(`Image upload failed: ${err instanceof Error ? err.message : String(err)}`);
+    } finally {
+      setUploadingImage(false);
+      if (imageInputRef.current) imageInputRef.current.value = '';
     }
   };
 
@@ -456,12 +478,20 @@ export default function RichTextEditor({ content, onChange, editable = true }: R
 
           <button
             onClick={addImage}
-            className="p-2 rounded hover:bg-gray-200 transition-colors text-gray-700"
+            disabled={uploadingImage}
+            className="p-2 rounded hover:bg-gray-200 transition-colors text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
             type="button"
-            title="Insert Image"
+            title={uploadingImage ? 'Uploading…' : 'Insert Image'}
           >
-            <MdImage className="w-5 h-5" />
+            <MdImage className={`w-5 h-5 ${uploadingImage ? 'animate-pulse' : ''}`} />
           </button>
+          <input
+            ref={imageInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleImagePick}
+            className="hidden"
+          />
 
           <button
             onClick={() => editor.chain().focus().setHorizontalRule().run()}

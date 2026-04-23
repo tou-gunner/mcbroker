@@ -52,6 +52,46 @@ When creating an insurance, metadata rows are emitted in two passes — once per
 ### Services vs DB (known inconsistency)
 [app/services/company.ts](app/services/company.ts) currently returns **hardcoded sample data** — it does *not* hit Prisma. The public pages under `app/(public)/[locale]/` (e.g. `CompanyListSection`) consume these services. The admin CMS and `/api/admin/*` routes hit Prisma. Before changing service signatures or sample data, verify which callers read from which.
 
+## Storage (MinIO S3 at `https://s3.mcins.la/mcins`)
+
+User-uploaded images live in a MinIO bucket. Uploads go through a **server-proxy** endpoint — browser credentials never touch MinIO.
+
+- **Endpoint**: [app/api/admin/upload/route.ts](app/api/admin/upload/route.ts) accepts `multipart/form-data` with `file`, `scope`, and (depending on scope) `entityId` or `entityKey`. Validates size (≤10MB) and MIME (`image/{jpeg,png,webp,gif,svg+xml}`). Returns `{ url, key }`.
+- **Client**: [app/lib/s3.ts](app/lib/s3.ts) is the singleton `S3Client` wrapped like `app/lib/prisma.ts`. `forcePathStyle: true` is **required** — MinIO does not support virtual-hosted-style URLs.
+- **Reusable UI**: [app/(admin)/admin/components/ImageUpload.tsx](app/(admin)/admin/components/ImageUpload.tsx) — drop-target + file picker. The TipTap editor in [RichTextEditor.tsx](app/(admin)/admin/components/RichTextEditor.tsx) has its own inline wiring (hidden input + toolbar button) that hits the same endpoint with `scope=insurance-content`.
+
+### Key layout (structured by entity)
+
+| Scope | Key pattern |
+|---|---|
+| `insurance-content` | `insurances/content/<uuid>.<ext>` — **not** per-insurance (see compromise below) |
+| `insurance-image` | `insurances/<insuranceId>/<uuid>.<ext>` |
+| `company-logo` | `companies/<companyId>/logo.<ext>` — overwrites on re-upload |
+| `banner` | `banners/<uuid>.<ext>` |
+| `setting` | `settings/<entityKey>.<ext>` |
+
+**Compromise**: `insurance-content` (images dropped into the TipTap editor) is flat under `insurances/content/` rather than scoped by insurance ID. Reason: the create form opens before the insurance has an ID, and copy/rename-on-save is complexity we don't want. Trade-off: abandoned-draft uploads become orphans. A future reconciliation job can walk `InsuranceContent.contentHtml` to identify unreferenced objects.
+
+### Bucket access
+
+Bucket `mcins` is **public-read** for all objects — anonymous `GET` works. Public pages render `<img src="https://s3.mcins.la/mcins/…">` directly, no signed URLs at render time. The public-read policy is applied on the MinIO side (see plan `/root/.claude/plans/plan-first-ask-me-zazzy-scone.md` for the JSON).
+
+### Env vars (in [.env](.env))
+
+```
+S3_ENDPOINT, S3_BUCKET, S3_ACCESS_KEY, S3_SECRET_KEY, S3_REGION, S3_PUBLIC_BASE_URL
+```
+
+`S3_REGION` is ignored by MinIO but required by the AWS SDK. `S3_PUBLIC_BASE_URL` is the render-time URL prefix and may differ from `S3_ENDPOINT` behind a CDN.
+
+### Migration of existing assets
+
+`scripts/migrate-assets-to-s3.ts` (run with `tsx scripts/migrate-assets-to-s3.ts`) uploads the 21 sample company logos, 3 banners, and `logo.png` to MinIO under the key layout above. Idempotent — safe to re-run. The referencing code ([app/services/company.ts](app/services/company.ts), `NavigationBar`, `HeroSection`) already points at the MinIO URLs, so the migration script must run before those URLs resolve.
+
+### Next.js image optimization
+
+[next.config.ts](next.config.ts) whitelists `s3.mcins.la` in `images.remotePatterns`, so `next/image` `<Image>` components can optimize MinIO-hosted assets. Plain `<img>` tags don't need this.
+
 ## Prisma v7 specifics (important)
 
 This project has been migrated to Prisma 7. Read [PRISMA V7 MIGRATION](PRISMA%20V7%20MIGRATION) before touching Prisma config. Key deviations from v6 muscle memory:

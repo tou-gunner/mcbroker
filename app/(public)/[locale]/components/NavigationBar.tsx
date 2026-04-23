@@ -56,7 +56,7 @@ export default function NavigationBar() {
     return (
         <div className="sticky top-0 z-100">
             <div className="w-full h-[60px] text-lg bg-white shadow-md flex items-center justify-between px-8">
-                <Link href="/" className="-ms-8 mt-3"><img src="/logo/logo.png" alt="MC" className="h-[75px]" /></Link>
+                <Link href="/" className="-ms-8 mt-3"><img src="https://s3.mcins.la/mcins/site/logo.png" alt="MC" className="h-[75px]" /></Link>
                 <div className="md:flex hidden items-center justify-center gap-6">
                     {menuItems.map((item, index) => (
                         <div key={item.href || index} className="relative group">

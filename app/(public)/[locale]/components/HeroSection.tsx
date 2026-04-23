@@ -19,9 +19,9 @@ const inter = Inter({
 });
 
 const banners = [
-    "/banners/banner-bg.jpg",
-    // "/banners/ins-banner1.jpg",
-    // "/banners/ins-banner2.jpg",
+    "https://s3.mcins.la/mcins/banners/banner-bg.jpg",
+    // "https://s3.mcins.la/mcins/banners/ins-banner1.jpg",
+    // "https://s3.mcins.la/mcins/banners/ins-banner2.jpg",
 ];
 
 interface HeroContent {

@@ -4,7 +4,7 @@ const sampleCompanies: CompanyResponse[] = [
     {
         id: "1",
         name: "Allianze",
-        logo: "/logo/1.jpg",
+        logo: "https://s3.mcins.la/mcins/companies/1/logo.jpg",
         description: "Leading provider of comprehensive life and accident insurance solutions with over 20 years of experience in the Lao market. Committed to protecting families and individuals with reliable coverage and exceptional customer service.",
         available_insurances: ["life", "accident"],
         createdAt: new Date(),
@@ -13,7 +13,7 @@ const sampleCompanies: CompanyResponse[] = [
     {
         id: "2",
         name: "AIA",
-        logo: "/logo/2.jpg",
+        logo: "https://s3.mcins.la/mcins/companies/2/logo.jpg",
         description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
         available_insurances: ["health", "accident"],
         createdAt: new Date(),
@@ -22,7 +22,7 @@ const sampleCompanies: CompanyResponse[] = [
     {
         id: "3",
         name: "Phongsavanh",
-        logo: "/logo/3.jpg",
+        logo: "https://s3.mcins.la/mcins/companies/3/logo.jpg",
         description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
         available_insurances: ["health", "accident"],
         createdAt: new Date(),
@@ -31,7 +31,7 @@ const sampleCompanies: CompanyResponse[] = [
     {
         id: "4",
         name: "BSH",
-        logo: "/logo/4.jpg",
+        logo: "https://s3.mcins.la/mcins/companies/4/logo.jpg",
         description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
         available_insurances: ["health", "accident"],
         createdAt: new Date(),
@@ -40,7 +40,7 @@ const sampleCompanies: CompanyResponse[] = [
     {
         id: "5",
         name: "Insee",
-        logo: "/logo/5.jpg",
+        logo: "https://s3.mcins.la/mcins/companies/5/logo.jpg",
         description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
         available_insurances: ["health", "accident"],
         createdAt: new Date(),
@@ -49,7 +49,7 @@ const sampleCompanies: CompanyResponse[] = [
     {
         id: "6",
         name: "HPC",
-        logo: "/logo/6.jpg",
+        logo: "https://s3.mcins.la/mcins/companies/6/logo.jpg",
         description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
         available_insurances: ["health", "accident"],
         createdAt: new Date(),
@@ -58,7 +58,7 @@ const sampleCompanies: CompanyResponse[] = [
     {
         id: "7",
         name: "Zhong Ji",
-        logo: "/logo/7.jpg",
+        logo: "https://s3.mcins.la/mcins/companies/7/logo.jpg",
         description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
         available_insurances: ["health", "accident"],
         createdAt: new Date(),
@@ -67,7 +67,7 @@ const sampleCompanies: CompanyResponse[] = [
     {
         id: "8",
         name: "Laothepchalern",
-        logo: "/logo/8.jpg",
+        logo: "https://s3.mcins.la/mcins/companies/8/logo.jpg",
         description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
         available_insurances: ["health", "accident"],
         createdAt: new Date(),
@@ -76,7 +76,7 @@ const sampleCompanies: CompanyResponse[] = [
     {
         id: "9",
         name: "Kungthep",
-        logo: "/logo/9.jpg",
+        logo: "https://s3.mcins.la/mcins/companies/9/logo.jpg",
         description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
         available_insurances: ["health", "accident"],
         createdAt: new Date(),
@@ -85,7 +85,7 @@ const sampleCompanies: CompanyResponse[] = [
     {
         id: "10",
         name: "Lao chine pacific",
-        logo: "/logo/10.jpg",
+        logo: "https://s3.mcins.la/mcins/companies/10/logo.jpg",
         description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
         available_insurances: ["health", "accident"],
         createdAt: new Date(),
@@ -94,7 +94,7 @@ const sampleCompanies: CompanyResponse[] = [
     {
         id: "11",
         name: "Lao vivat",
-        logo: "/logo/11.jpg",
+        logo: "https://s3.mcins.la/mcins/companies/11/logo.jpg",
         description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
         available_insurances: ["health", "accident"],
         createdAt: new Date(),
@@ -103,7 +103,7 @@ const sampleCompanies: CompanyResponse[] = [
     {
         id: "12",
         name: "LVI",
-        logo: "/logo/12.jpg",
+        logo: "https://s3.mcins.la/mcins/companies/12/logo.jpg",
         description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
         available_insurances: ["health", "accident"],
         createdAt: new Date(),
@@ -112,7 +112,7 @@ const sampleCompanies: CompanyResponse[] = [
     {
         id: "13",
         name: "MSIG",
-        logo: "/logo/13.jpg",
+        logo: "https://s3.mcins.la/mcins/companies/13/logo.jpg",
         description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
         available_insurances: ["health", "accident"],
         createdAt: new Date(),
@@ -121,7 +121,7 @@ const sampleCompanies: CompanyResponse[] = [
     {
         id: "14",
         name: "Lanxang",
-        logo: "/logo/14.jpg",
+        logo: "https://s3.mcins.la/mcins/companies/14/logo.jpg",
         description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
         available_insurances: ["health", "accident"],
         createdAt: new Date(),
@@ -130,7 +130,7 @@ const sampleCompanies: CompanyResponse[] = [
     {
         id: "15",
         name: "Prudential",
-        logo: "/logo/15.jpg",
+        logo: "https://s3.mcins.la/mcins/companies/15/logo.jpg",
         description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
         available_insurances: ["health", "accident"],
         createdAt: new Date(),
@@ -139,7 +139,7 @@ const sampleCompanies: CompanyResponse[] = [
     {
         id: "16",
         name: "Muanfthai",
-        logo: "/logo/16.jpg",
+        logo: "https://s3.mcins.la/mcins/companies/16/logo.jpg",
         description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
         available_insurances: ["health", "accident"],
         createdAt: new Date(),
@@ -148,7 +148,7 @@ const sampleCompanies: CompanyResponse[] = [
     {
         id: "17",
         name: "Toyota",
-        logo: "/logo/17.jpg",
+        logo: "https://s3.mcins.la/mcins/companies/17/logo.jpg",
         description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
         available_insurances: ["health", "accident"],
         createdAt: new Date(),
@@ -157,7 +157,7 @@ const sampleCompanies: CompanyResponse[] = [
     {
         id: "18",
         name: "TK",
-        logo: "/logo/17.jpg",
+        logo: "https://s3.mcins.la/mcins/companies/17/logo.jpg",
         description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
         available_insurances: ["health", "accident"],
         createdAt: new Date(),
@@ -166,7 +166,7 @@ const sampleCompanies: CompanyResponse[] = [
     {
         id: "19",
         name: "Thipphaya",
-        logo: "/logo/19.jpg",
+        logo: "https://s3.mcins.la/mcins/companies/19/logo.jpg",
         description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
         available_insurances: ["health", "accident"],
         createdAt: new Date(),
@@ -175,7 +175,7 @@ const sampleCompanies: CompanyResponse[] = [
     {
         id: "20",
         name: "VTI",
-        logo: "/logo/20.jpg",
+        logo: "https://s3.mcins.la/mcins/companies/20/logo.jpg",
         description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
         available_insurances: ["health", "accident"],
         createdAt: new Date(),
@@ -184,7 +184,7 @@ const sampleCompanies: CompanyResponse[] = [
     {
         id: "21",
         name: "Sokxay",
-        logo: "/logo/21.jpg",
+        logo: "https://s3.mcins.la/mcins/companies/21/logo.jpg",
         description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
         available_insurances: ["health", "accident"],
         createdAt: new Date(),
