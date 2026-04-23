@@ -47,16 +47,38 @@ export default function InsuranceListPage() {
     { key: 'id', label: 'ID', isId: true, hidden: true },
     { key: 'name', label: 'Name' },
     { key: 'slug', label: 'Slug' },
-    { 
-      key: 'status', 
-      label: 'Status', 
-      render: (insurance: Insurance) => <span className={`text-sm font-medium ${insurance.status === 'PUBLISHED' ? 'text-green-600' : 'text-red-600'}`}>{insurance.status}</span> 
+    {
+      key: 'status',
+      label: 'Status',
+      render: (insurance: Insurance) => <span className={`text-sm font-medium ${insurance.status === 'PUBLISHED' ? 'text-green-600' : 'text-red-600'}`}>{insurance.status}</span>
     },
     { key: 'featured', label: 'Featured' },
     { key: 'category', label: 'Category' },
     { key: 'company', label: 'Company' },
     { key: 'createdAt', label: 'Created At' },
     { key: 'updatedAt', label: 'Updated At' },
+    {
+      key: 'actions',
+      label: 'Actions',
+      render: (insurance: Insurance) => (
+        <div className="flex items-center justify-end space-x-1.5">
+          <button
+            onClick={() => router.push(`/admin/insurances/${insurance.id}`)}
+            className="p-1.5 text-primary hover:bg-primary/10 rounded transition-colors"
+            title="Edit"
+          >
+            <MdEdit className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => handleDelete(insurance.id)}
+            className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors"
+            title="Delete"
+          >
+            <MdDelete className="w-4 h-4" />
+          </button>
+        </div>
+      ),
+    },
   ];
 
   useEffect(() => {

@@ -1,203 +1,65 @@
 import { CompanyResponse } from "@/app/interfaces";
+import { prisma } from "@/app/lib/prisma";
 
-const sampleCompanies: CompanyResponse[] = [
-    {
-        id: "1",
-        name: "Allianze",
-        logo: "https://s3.mcins.la/mcins/companies/1/logo.jpg",
-        description: "Leading provider of comprehensive life and accident insurance solutions with over 20 years of experience in the Lao market. Committed to protecting families and individuals with reliable coverage and exceptional customer service.",
-        available_insurances: ["life", "accident"],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
-        id: "2",
-        name: "AIA",
-        logo: "https://s3.mcins.la/mcins/companies/2/logo.jpg",
-        description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
-        available_insurances: ["health", "accident"],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
-        id: "3",
-        name: "Phongsavanh",
-        logo: "https://s3.mcins.la/mcins/companies/3/logo.jpg",
-        description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
-        available_insurances: ["health", "accident"],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
-        id: "4",
-        name: "BSH",
-        logo: "https://s3.mcins.la/mcins/companies/4/logo.jpg",
-        description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
-        available_insurances: ["health", "accident"],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
-        id: "5",
-        name: "Insee",
-        logo: "https://s3.mcins.la/mcins/companies/5/logo.jpg",
-        description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
-        available_insurances: ["health", "accident"],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
-        id: "6",
-        name: "HPC",
-        logo: "https://s3.mcins.la/mcins/companies/6/logo.jpg",
-        description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
-        available_insurances: ["health", "accident"],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
-        id: "7",
-        name: "Zhong Ji",
-        logo: "https://s3.mcins.la/mcins/companies/7/logo.jpg",
-        description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
-        available_insurances: ["health", "accident"],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
-        id: "8",
-        name: "Laothepchalern",
-        logo: "https://s3.mcins.la/mcins/companies/8/logo.jpg",
-        description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
-        available_insurances: ["health", "accident"],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
-        id: "9",
-        name: "Kungthep",
-        logo: "https://s3.mcins.la/mcins/companies/9/logo.jpg",
-        description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
-        available_insurances: ["health", "accident"],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
-        id: "10",
-        name: "Lao chine pacific",
-        logo: "https://s3.mcins.la/mcins/companies/10/logo.jpg",
-        description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
-        available_insurances: ["health", "accident"],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
-        id: "11",
-        name: "Lao vivat",
-        logo: "https://s3.mcins.la/mcins/companies/11/logo.jpg",
-        description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
-        available_insurances: ["health", "accident"],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
-        id: "12",
-        name: "LVI",
-        logo: "https://s3.mcins.la/mcins/companies/12/logo.jpg",
-        description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
-        available_insurances: ["health", "accident"],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
-        id: "13",
-        name: "MSIG",
-        logo: "https://s3.mcins.la/mcins/companies/13/logo.jpg",
-        description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
-        available_insurances: ["health", "accident"],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
-        id: "14",
-        name: "Lanxang",
-        logo: "https://s3.mcins.la/mcins/companies/14/logo.jpg",
-        description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
-        available_insurances: ["health", "accident"],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
-        id: "15",
-        name: "Prudential",
-        logo: "https://s3.mcins.la/mcins/companies/15/logo.jpg",
-        description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
-        available_insurances: ["health", "accident"],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
-        id: "16",
-        name: "Muanfthai",
-        logo: "https://s3.mcins.la/mcins/companies/16/logo.jpg",
-        description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
-        available_insurances: ["health", "accident"],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
-        id: "17",
-        name: "Toyota",
-        logo: "https://s3.mcins.la/mcins/companies/17/logo.jpg",
-        description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
-        available_insurances: ["health", "accident"],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
-        id: "18",
-        name: "TK",
-        logo: "https://s3.mcins.la/mcins/companies/17/logo.jpg",
-        description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
-        available_insurances: ["health", "accident"],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
-        id: "19",
-        name: "Thipphaya",
-        logo: "https://s3.mcins.la/mcins/companies/19/logo.jpg",
-        description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
-        available_insurances: ["health", "accident"],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
-        id: "20",
-        name: "VTI",
-        logo: "https://s3.mcins.la/mcins/companies/20/logo.jpg",
-        description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
-        available_insurances: ["health", "accident"],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
-        id: "21",
-        name: "Sokxay",
-        logo: "https://s3.mcins.la/mcins/companies/21/logo.jpg",
-        description: "Trusted insurance partner specializing in health and accident protection. We offer flexible insurance plans tailored to your needs, backed by a nationwide network of healthcare providers and quick claim processing.",
-        available_insurances: ["health", "accident"],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-];
+type MetadataRow = { locale: string; key: string; value: string };
 
-export const getCompanyList: () => Promise<CompanyResponse[]> = () => new Promise((resolve) => {
-    resolve(sampleCompanies);
+const pickMetadata = (metadata: MetadataRow[], locale: string, key: string): string =>
+    metadata.find((m) => m.locale === locale && m.key === key)?.value
+    ?? metadata.find((m) => m.locale === 'en' && m.key === key)?.value
+    ?? '';
+
+type CompanyWithRelations = {
+    id: string;
+    logo: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+    metadata: MetadataRow[];
+    insurances: { category: { slug: string } }[];
+};
+
+const toResponse = (company: CompanyWithRelations, locale: string): CompanyResponse => ({
+    id: company.id,
+    name: pickMetadata(company.metadata, locale, 'name'),
+    description: pickMetadata(company.metadata, locale, 'description'),
+    logo: company.logo ?? '',
+    available_insurances: Array.from(
+        new Set(company.insurances.map((i) => i.category.slug)),
+    ),
+    createdAt: company.createdAt,
+    updatedAt: company.updatedAt,
 });
 
-export const getCompany = async (id: string): Promise<CompanyResponse | undefined> => {
-    return new Promise((resolve) => {
-        resolve(sampleCompanies.find((company) => company.id === id));
+export const getCompanyList = async (locale: string = 'en'): Promise<CompanyResponse[]> => {
+    const companies = await prisma.company.findMany({
+        where: { isActive: true },
+        include: {
+            metadata: true,
+            insurances: {
+                where: { status: 'PUBLISHED' },
+                select: { category: { select: { slug: true } } },
+            },
+        },
+        orderBy: { createdAt: 'asc' },
     });
-}
+
+    return companies.map((c) => toResponse(c, locale));
+};
+
+export const getCompany = async (
+    id: string,
+    locale: string = 'en',
+): Promise<CompanyResponse | undefined> => {
+    const company = await prisma.company.findUnique({
+        where: { id },
+        include: {
+            metadata: true,
+            insurances: {
+                where: { status: 'PUBLISHED' },
+                select: { category: { select: { slug: true } } },
+            },
+        },
+    });
+
+    if (!company || !company.isActive) return undefined;
+    return toResponse(company, locale);
+};

@@ -2,10 +2,10 @@ import { getCompany, getInsurancesByCompanyId } from "@/app/services";
 import { getInsuranceLogo } from "@/app/utils";
 import Image from "next/image";
 
-export default async function CompanyPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const company = await getCompany(id);
-  const insurances = await getInsurancesByCompanyId(id);
+export default async function CompanyPage({ params }: { params: Promise<{ id: string; locale: string }> }) {
+  const { id, locale } = await params;
+  const company = await getCompany(id, locale);
+  const insurances = await getInsurancesByCompanyId(id, locale);
 
   if (!company) {
     return <div>Company not found</div>;

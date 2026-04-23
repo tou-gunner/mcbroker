@@ -1,92 +1,42 @@
 import { InsuranceResponse } from "@/app/interfaces";
+import { prisma } from "@/app/lib/prisma";
 
-const sampleInsurances: InsuranceResponse[] = [
-    {
-        id: "1",
-        name: "Life Insurance",
-        category: "life",
-        description: "Life Insurance is a type of insurance that provides a financial benefit to the insured's beneficiaries in the event of the insured's death.",
-        companyId: "1",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
-        id: "2",
-        name: "Health Insurance",
-        category: "health",
-        description: "Health Insurance is a type of insurance that provides a financial benefit to the insured's beneficiaries in the event of the insured's death.",
-        companyId: "1",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
-        id: "3",
-        name: "Accident Insurance",
-        category: "accident",
-        description: "Accident Insurance is a type of insurance that provides a financial benefit to the insured's beneficiaries in the event of the insured's death.",
-        companyId: "1",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
-        id: "4",
-        name: "Travel Insurance",
-        category: "travel",
-        description: "Travel Insurance is a type of insurance that provides a financial benefit to the insured's beneficiaries in the event of the insured's death.",
-        companyId: "2",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
-        id: "5",
-        name: "Home Insurance",
-        category: "home",
-        description: "Home Insurance is a type of insurance that provides a financial benefit to the insured's beneficiaries in the event of the insured's death.",
-        companyId: "2",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
-        id: "6",
-        name: "Car Insurance",
-        category: "car",
-        description: "Car Insurance is a type of insurance that provides a financial benefit to the insured's beneficiaries in the event of the insured's death.",
-        companyId: "2",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
-        id: "7",
-        name: "Business Insurance",
-        category: "business",
-        description: "Business Insurance is a type of insurance that provides a financial benefit to the insured's beneficiaries in the event of the insured's death.",
-        companyId: "3",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
-        id: "8",
-        name: "Life Insurance",
-        category: "life",
-        description: "Life Insurance is a type of insurance that provides a financial benefit to the insured's beneficiaries in the event of the insured's death.",
-        companyId: "3",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
-        id: "9",
-        name: "Accident Insurance",
-        category: "accident",
-        description: "Accident Insurance is a type of insurance that provides a financial benefit to the insured's beneficiaries in the event of the insured's death.",
-        companyId: "3",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-];
+const pickMetadata = (
+    metadata: { locale: string; key: string; value: string }[],
+    locale: string,
+    key: string,
+): string =>
+    metadata.find((m) => m.locale === locale && m.key === key)?.value
+    ?? metadata.find((m) => m.locale === 'en' && m.key === key)?.value
+    ?? '';
 
-export const getInsurancesByCompanyId: (companyId: string) => Promise<InsuranceResponse[]> = (companyId: string) => new Promise((resolve) => {
-    resolve(sampleInsurances.filter((insurance) => insurance.companyId === companyId));
-});
+export const getInsurancesByCompanyId = async (
+    companyId: string,
+    locale: string = 'en',
+): Promise<InsuranceResponse[]> => {
+    const insurances = await prisma.insurance.findMany({
+        where: { companyId, status: 'PUBLISHED' },
+        include: {
+            category: { include: { metadata: { where: { key: 'name' } } } },
+            metadata: true,
+        },
+        orderBy: [
+            { featured: 'desc' },
+            { priority: 'desc' },
+            { createdAt: 'desc' },
+        ],
+    });
+
+    return insurances.map((insurance) => ({
+        id: insurance.id,
+        name: pickMetadata(insurance.metadata, locale, 'name'),
+        description: pickMetadata(insurance.metadata, locale, 'description'),
+        category: insurance.category.slug,
+        companyId: insurance.companyId,
+        createdAt: insurance.createdAt,
+        updatedAt: insurance.updatedAt,
+    }));
+};
 
 export const getInsuranceById = async (id: string, locale: string = 'en'): Promise<InsuranceResponse | undefined> => {
     try {

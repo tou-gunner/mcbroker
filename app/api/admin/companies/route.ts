@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/app/lib/prisma';
+import { getSessionAdmin } from '@/app/lib/session';
 
 // GET /api/admin/companies - Get all insurance companies
 export async function GET(request: NextRequest) {
@@ -27,8 +28,11 @@ export async function GET(request: NextRequest) {
       id: company.id,
       slug: company.slug,
       logo: company.logo,
+      isActive: company.isActive,
       name: company.metadata.find(m => m.key === 'name')?.value || company.slug,
       insuranceCount: company.insurances.length,
+      createdBy: company.createdBy,
+      updatedBy: company.updatedBy,
       createdAt: company.createdAt,
       updatedAt: company.updatedAt
     }));
@@ -67,11 +71,15 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
+    const admin = await getSessionAdmin();
+
     // Create company with metadata
     const company = await prisma.company.create({
       data: {
         slug,
         logo: logo || null,
+        createdBy: admin?.id ?? null,
+        updatedBy: admin?.id ?? null,
         metadata: {
           create: metadata.map((meta: any) => ({
             locale: meta.locale,

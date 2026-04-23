@@ -1,6 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react'
+import { useLocale } from 'next-intl'
 import { CompanyResponse } from '@/app/interfaces'
 
 interface AppContextType {
@@ -32,6 +33,7 @@ interface AppProviderProps {
 }
 
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
+  const locale = useLocale()
   const [companies, setCompanies] = useState<CompanyResponse[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -40,11 +42,11 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const fetchCompanies = useCallback(async () => {
     setIsLoading(true)
     setError(null)
-    
+
     try {
-      const response = await fetch('/api/companies')
+      const response = await fetch(`/api/companies?locale=${locale}`)
       const data = await response.json()
-      
+
       if (data.success) {
         setCompanies(data.data)
       } else {
@@ -56,7 +58,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [locale])
 
   const getFilteredCompanies = useCallback((filter?: string) => {
     const activeFilter = filter ?? selectedFilter

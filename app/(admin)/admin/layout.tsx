@@ -8,6 +8,7 @@ import { DialogProvider } from './components/DialogProvider';
 import {
   MdDashboard,
   MdDescription,
+  MdBusiness,
   MdPeople,
   MdSettings,
   MdLogout,
@@ -27,6 +28,7 @@ interface AdminLayoutProps {
 const menuItems = [
   { icon: MdDashboard, label: 'Dashboard', href: '/admin/dashboard' },
   { icon: MdDescription, label: 'Insurance Plans', href: '/admin/insurances' },
+  { icon: MdBusiness, label: 'Companies', href: '/admin/companies' },
   { icon: MdImage, label: 'Banners', href: '/admin/banners' },
   { icon: MdPeople, label: 'Customers', href: '/admin/customers' },
   { icon: MdShield, label: 'Claims', href: '/admin/claims' },

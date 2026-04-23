@@ -4,16 +4,17 @@ import { getInsurancesByCompanyId } from "@/app/services/insurance";
 export const GET = async (request: NextRequest) => {
     const searchParams = request.nextUrl.searchParams;
     const companyId = searchParams.get('companyId');
-    
+    const locale = searchParams.get('locale') || 'en';
+
     if (!companyId) {
         return NextResponse.json({
             success: false,
             error: 'companyId is required',
         }, { status: 400 });
     }
-    
+
     return NextResponse.json({
         success: true,
-        data: await getInsurancesByCompanyId(companyId),
+        data: await getInsurancesByCompanyId(companyId, locale),
     });
 };
