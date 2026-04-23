@@ -14,7 +14,8 @@ import {
   MdShield,
   MdNotifications,
   MdSearch,
-  MdCleaningServices
+  MdCleaningServices,
+  MdImage
 } from 'react-icons/md';
 
 interface AdminLayoutProps {
@@ -24,6 +25,7 @@ interface AdminLayoutProps {
 const menuItems = [
   { icon: MdDashboard, label: 'Dashboard', href: '/admin/dashboard' },
   { icon: MdDescription, label: 'Insurance Plans', href: '/admin/insurances' },
+  { icon: MdImage, label: 'Banners', href: '/admin/banners' },
   { icon: MdPeople, label: 'Customers', href: '/admin/customers' },
   { icon: MdShield, label: 'Claims', href: '/admin/claims' },
   { icon: MdSettings, label: 'Settings', href: '/admin/settings' },

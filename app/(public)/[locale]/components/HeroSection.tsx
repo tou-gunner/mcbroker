@@ -18,10 +18,8 @@ const inter = Inter({
     display: "swap",
 });
 
-const banners = [
+const FALLBACK_BANNERS = [
     "https://s3.mcins.la/mcins/banners/banner-bg.jpg",
-    // "https://s3.mcins.la/mcins/banners/ins-banner1.jpg",
-    // "https://s3.mcins.la/mcins/banners/ins-banner2.jpg",
 ];
 
 interface HeroContent {
@@ -29,11 +27,20 @@ interface HeroContent {
     subtitle: string;
 }
 
+interface Banner {
+    id: string;
+    imageUrl: string;
+    linkUrl: string | null;
+}
+
 export default function HeroSection() {
     const t = useTranslations("hero");
     const locale = useLocale();
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isLoaded, setIsLoaded] = useState(false);
+    const [banners, setBanners] = useState<Banner[]>(
+        FALLBACK_BANNERS.map((url, i) => ({ id: `fallback-${i}`, imageUrl: url, linkUrl: null }))
+    );
     const [heroContent, setHeroContent] = useState<HeroContent>({
         title: t('title'),
         subtitle: t('subtitle')
@@ -41,13 +48,12 @@ export default function HeroSection() {
 
     useEffect(() => {
         setIsLoaded(true);
-        
-        // Fetch hero settings from API
+
         const fetchHeroSettings = async () => {
             try {
                 const response = await fetch(`/api/settings?prefix=hero_&locale=${locale}`);
                 const result = await response.json();
-                
+
                 if (result.success && result.data) {
                     setHeroContent({
                         title: result.data.hero_title || t('title'),
@@ -56,11 +62,24 @@ export default function HeroSection() {
                 }
             } catch (error) {
                 console.error('Error fetching hero settings:', error);
-                // Keep default translations on error
+            }
+        };
+
+        const fetchBanners = async () => {
+            try {
+                const response = await fetch('/api/banners');
+                const result = await response.json();
+                if (result.success && Array.isArray(result.data) && result.data.length > 0) {
+                    setBanners(result.data);
+                    setCurrentIndex(0);
+                }
+            } catch (error) {
+                console.error('Error fetching banners:', error);
             }
         };
 
         fetchHeroSettings();
+        fetchBanners();
     }, [locale, t]);
 
     // Auto-play functionality
@@ -98,27 +117,38 @@ export default function HeroSection() {
         <div className="relative w-full h-[500px] md:h-[600px] lg:h-[700px] overflow-hidden group">
             {/* Carousel Images */}
             <div className="relative w-full h-full">
-                {banners.map((banner, index) => (
-                    <div
-                        key={index}
-                        className={`absolute top-0 left-0 w-full h-full transition-opacity duration-1000 ease-in-out ${
-                            index === currentIndex ? "opacity-100" : "opacity-0"
-                        }`}
-                    >
-                        <div className="absolute inset-0 bg-black/20 z-1" /> {/* Simple overlay for contrast */}
-                            <Image
-                                src={banner}
-                                alt={`Banner ${index + 1}`}
-                                fill
-                                className="object-cover"
-                                priority={index === 0}
-                                style={{
+                {banners.map((banner, index) => {
+                    const image = (
+                        <Image
+                            src={banner.imageUrl}
+                            alt={`Banner ${index + 1}`}
+                            fill
+                            className="object-cover"
+                            priority={index === 0}
+                            style={{
                                 maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 60%, rgba(0,0,0,0.7) 85%, rgba(0,0,0,0) 100%)',
                                 WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 60%, rgba(0,0,0,0.7) 85%, rgba(0,0,0,0) 100%)'
-                                }}
-                            />
-                    </div>
-                ))}
+                            }}
+                        />
+                    );
+                    return (
+                        <div
+                            key={banner.id}
+                            className={`absolute top-0 left-0 w-full h-full transition-opacity duration-1000 ease-in-out ${
+                                index === currentIndex ? "opacity-100" : "opacity-0"
+                            }`}
+                        >
+                            <div className="absolute inset-0 bg-black/20 z-1" />
+                            {banner.linkUrl ? (
+                                <a href={banner.linkUrl} className="block w-full h-full">
+                                    {image}
+                                </a>
+                            ) : (
+                                image
+                            )}
+                        </div>
+                    );
+                })}
             </div>
 
             {/* Overlay Text */}
