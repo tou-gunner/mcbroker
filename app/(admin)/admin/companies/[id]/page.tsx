@@ -3,10 +3,17 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
-import { MdSave, MdArrowBack, MdDelete, MdDeleteForever } from 'react-icons/md';
+import {
+  MdSave,
+  MdArrowBack,
+  MdDelete,
+  MdDeleteForever,
+  MdEdit,
+} from 'react-icons/md';
 import { toast } from 'sonner';
 import ImageUpload from '../../components/ImageUpload';
 import { useConfirm } from '../../components/DialogProvider';
+import DataTable, { DataColumn } from '../../components/DataTable';
 
 interface CompanyForm {
   slug: string;
@@ -30,6 +37,21 @@ interface CompanyData {
   updatedAt: string;
   metadata: Record<string, Record<string, string>>;
   insuranceCount: number;
+}
+
+interface InsuranceRow {
+  id: string;
+  name: string;
+  slug: string;
+  status: string;
+  featured: boolean;
+  category: {
+    id: string;
+    name: string;
+    slug: string;
+  };
+  createdAt: string;
+  updatedAt: string;
 }
 
 export default function CompanyEditorPage() {
@@ -314,6 +336,28 @@ export default function CompanyEditorPage() {
 
   const currentMetadata = getCurrentMetadata();
 
+  const insuranceColumns: DataColumn<InsuranceRow>[] = [
+    { key: 'name', label: 'Name' },
+    { key: 'slug', label: 'Slug', sortable: true },
+    {
+      key: 'status',
+      label: 'Status',
+      sortable: true,
+      render: (i) => (
+        <span
+          className={`text-sm font-medium ${
+            i.status === 'PUBLISHED' ? 'text-green-600' : 'text-red-600'
+          }`}
+        >
+          {i.status}
+        </span>
+      ),
+    },
+    { key: 'featured', label: 'Featured', sortable: true },
+    { key: 'category', label: 'Category' },
+    { key: 'updatedAt', label: 'Updated', sortable: true },
+  ];
+
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       {/* Header */}
@@ -503,6 +547,40 @@ export default function CompanyEditorPage() {
           </div>
         )}
       </div>
+
+      {/* Linked insurances */}
+      {isEdit && company && (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="mb-4">
+            <h2 className="text-lg font-semibold text-gray-800">
+              Insurances
+            </h2>
+            <p className="text-sm text-gray-500 mt-1">
+              Insurance products linked to this company.
+            </p>
+          </div>
+
+          <DataTable<InsuranceRow>
+            fetchUrl="/api/admin/insurances"
+            staticParams={{ locale: 'en', companyId }}
+            keyColumn="id"
+            columns={insuranceColumns}
+            search={{ placeholder: 'Search insurances in this company...' }}
+            pagination={{ perPage: 10 }}
+            urlSync={false}
+            emptyMessage="No insurances linked to this company yet."
+            actions={(i) => (
+              <button
+                onClick={() => router.push(`/admin/insurances/${i.id}`)}
+                className="p-1.5 text-primary hover:bg-primary/10 rounded transition-colors"
+                title="Edit"
+              >
+                <MdEdit className="w-4 h-4" />
+              </button>
+            )}
+          />
+        </div>
+      )}
 
       {/* Audit footer */}
       {isEdit && company && (
