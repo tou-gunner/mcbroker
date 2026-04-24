@@ -10,7 +10,7 @@ import {
 } from "@/app/lib/s3";
 import { prisma } from "@/app/lib/prisma";
 
-const MAX_SIZE = 10 * 1024 * 1024;
+const MAX_SIZE = 100 * 1024 * 1024;
 
 const SCOPES = [
   "insurance-content",
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
     }
     if (file.size > MAX_SIZE) {
       return NextResponse.json(
-        { error: `file exceeds ${MAX_SIZE} bytes (10MB)` },
+        { error: `file exceeds ${MAX_SIZE} bytes (100MB)` },
         { status: 400 },
       );
     }

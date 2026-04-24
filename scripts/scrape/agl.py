@@ -25,6 +25,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from agl_known_pages import KNOWN_PAGES
+from agl_content import extract_content
 
 BASE_URL = "https://www.agl.com.la"
 HOME_URL = f"{BASE_URL}/"
@@ -72,6 +73,7 @@ class Product:
     name_en: str
     description_en: str
     thumbnail_url: str | None
+    content: dict  # {html, text, inline_images[], pdf_links[{href,text}]}
 
 
 def fetch(url: str, referer: str | None = None) -> str:
@@ -218,6 +220,7 @@ def parse_product(html: str, page_id: int, category_slug: str) -> Product:
     # on AGL pages are mostly boilerplate site-wide copy.
     desc = _hero_description(soup) or _meta_description(soup)
     thumb = _hero_image(soup)
+    content = extract_content(html, page_id, name_en=name, thumbnail_url=thumb)
     return Product(
         page_id=page_id,
         source_url=f"{BASE_URL}/?page_id={page_id}",
@@ -225,6 +228,7 @@ def parse_product(html: str, page_id: int, category_slug: str) -> Product:
         name_en=name,
         description_en=desc,
         thumbnail_url=thumb,
+        content=content,
     )
 
 
