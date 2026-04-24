@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import { useTranslation } from 'react-i18next';
 
 type Variant = 'default' | 'danger';
 
@@ -65,6 +66,7 @@ export function usePrompt() {
 }
 
 export function DialogProvider({ children }: { children: React.ReactNode }) {
+  const { t } = useTranslation();
   const [state, setState] = useState<DialogState>(null);
   const [promptValue, setPromptValue] = useState('');
   const [promptError, setPromptError] = useState<string | null>(null);
@@ -216,7 +218,7 @@ export function DialogProvider({ children }: { children: React.ReactNode }) {
                 onClick={cancel}
                 className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
               >
-                {state.options.cancelLabel ?? 'Cancel'}
+                {state.options.cancelLabel ?? t('dialogs.cancel')}
               </button>
               <button
                 type="button"
@@ -228,7 +230,7 @@ export function DialogProvider({ children }: { children: React.ReactNode }) {
                 }`}
               >
                 {state.options.confirmLabel ??
-                  (state.kind === 'confirm' ? 'Confirm' : 'OK')}
+                  (state.kind === 'confirm' ? t('dialogs.confirm') : t('dialogs.ok'))}
               </button>
             </div>
           </div>

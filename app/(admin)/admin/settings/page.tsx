@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { MdSave, MdRefresh, MdImage, MdTextFields } from 'react-icons/md';
+import { useTranslation } from 'react-i18next';
+import { MdSave, MdRefresh, MdImage, MdTextFields, MdLanguage } from 'react-icons/md';
 
 interface SettingValue {
   en: string;
@@ -19,6 +20,7 @@ const defaultSettings: HeroSettings = {
 };
 
 export default function SettingsPage() {
+  const { t, i18n } = useTranslation();
   const [settings, setSettings] = useState<HeroSettings>(defaultSettings);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -48,7 +50,7 @@ export default function SettingsPage() {
       }
     } catch (error) {
       console.error('Error fetching settings:', error);
-      setMessage({ type: 'error', text: 'Failed to load settings' });
+      setMessage({ type: 'error', text: t('settings.loadFailed') });
     } finally {
       setLoading(false);
     }
@@ -75,13 +77,13 @@ export default function SettingsPage() {
       const result = await response.json();
 
       if (result.success) {
-        setMessage({ type: 'success', text: 'Settings saved successfully!' });
+        setMessage({ type: 'success', text: t('settings.savedSuccess') });
       } else {
-        setMessage({ type: 'error', text: result.error || 'Failed to save settings' });
+        setMessage({ type: 'error', text: result.error || t('settings.saveFailed') });
       }
     } catch (error) {
       console.error('Error saving settings:', error);
-      setMessage({ type: 'error', text: 'Failed to save settings' });
+      setMessage({ type: 'error', text: t('settings.saveFailed') });
     } finally {
       setSaving(false);
     }
@@ -105,20 +107,60 @@ export default function SettingsPage() {
     );
   }
 
+  const currentLanguage = (i18n.resolvedLanguage || i18n.language || 'lo').slice(0, 2);
+
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Site Settings</h1>
-        <p className="text-gray-500 mt-1">Configure your website content and appearance</p>
+    <div className="max-w-4xl mx-auto space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-800">{t('settings.title')}</h1>
+        <p className="text-gray-500 mt-1">{t('settings.subtitle')}</p>
       </div>
 
       {message && (
-        <div className={`mb-6 p-4 rounded-lg ${
+        <div className={`p-4 rounded-lg ${
           message.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
         }`}>
           {message.text}
         </div>
       )}
+
+      {/* Admin Language */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-primary/10 to-primary/5">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <MdLanguage className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-gray-800">{t('settings.adminLanguage')}</h2>
+              <p className="text-sm text-gray-500">{t('settings.adminLanguageHint')}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-6">
+          <div className="grid grid-cols-2 gap-3 max-w-md">
+            {(['lo', 'en'] as const).map((lng) => {
+              const isActive = currentLanguage === lng;
+              return (
+                <button
+                  key={lng}
+                  type="button"
+                  onClick={() => i18n.changeLanguage(lng)}
+                  className={`px-4 py-3 rounded-lg border-2 text-sm font-medium transition-colors ${
+                    isActive
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+                  }`}
+                  aria-pressed={isActive}
+                >
+                  {lng === 'en' ? t('settings.languageEnglish') : t('settings.languageLao')}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
 
       {/* Hero Section Settings */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -128,8 +170,8 @@ export default function SettingsPage() {
               <MdImage className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-gray-800">Hero Section</h2>
-              <p className="text-sm text-gray-500">Configure the hero banner text on the homepage</p>
+              <h2 className="text-lg font-semibold text-gray-800">{t('settings.heroSection')}</h2>
+              <p className="text-sm text-gray-500">{t('settings.heroSectionSubtitle')}</p>
             </div>
           </div>
         </div>
@@ -139,32 +181,32 @@ export default function SettingsPage() {
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-gray-700 font-medium">
               <MdTextFields className="w-5 h-5" />
-              <span>Hero Title</span>
+              <span>{t('settings.heroTitle')}</span>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-600 mb-2">
-                  English 🇺🇸
+                  {t('settings.english')} 🇺🇸
                 </label>
                 <input
                   type="text"
                   value={settings.hero_title.en}
                   onChange={(e) => handleChange('hero_title', 'en', e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
-                  placeholder="Enter hero title in English"
+                  placeholder={t('settings.heroTitleEnPlaceholder')}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-600 mb-2">
-                  ລາວ 🇱🇦
+                  {t('settings.lao')} 🇱🇦
                 </label>
                 <input
                   type="text"
                   value={settings.hero_title.lo}
                   onChange={(e) => handleChange('hero_title', 'lo', e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
-                  placeholder="ປ້ອນຫົວຂໍ້ເປັນພາສາລາວ"
+                  placeholder={t('settings.heroTitleLoPlaceholder')}
                 />
               </div>
             </div>
@@ -174,32 +216,32 @@ export default function SettingsPage() {
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-gray-700 font-medium">
               <MdTextFields className="w-5 h-5" />
-              <span>Hero Subtitle</span>
+              <span>{t('settings.heroSubtitle')}</span>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-600 mb-2">
-                  English 🇺🇸
+                  {t('settings.english')} 🇺🇸
                 </label>
                 <textarea
                   value={settings.hero_subtitle.en}
                   onChange={(e) => handleChange('hero_subtitle', 'en', e.target.value)}
                   rows={3}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors resize-none"
-                  placeholder="Enter hero subtitle in English"
+                  placeholder={t('settings.heroSubtitleEnPlaceholder')}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-600 mb-2">
-                  ລາວ 🇱🇦
+                  {t('settings.lao')} 🇱🇦
                 </label>
                 <textarea
                   value={settings.hero_subtitle.lo}
                   onChange={(e) => handleChange('hero_subtitle', 'lo', e.target.value)}
                   rows={3}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors resize-none"
-                  placeholder="ປ້ອນຄຳອະທິບາຍເປັນພາສາລາວ"
+                  placeholder={t('settings.heroSubtitleLoPlaceholder')}
                 />
               </div>
             </div>
@@ -207,15 +249,15 @@ export default function SettingsPage() {
 
           {/* Preview */}
           <div className="mt-6 p-4 bg-gray-900 rounded-lg">
-            <p className="text-xs text-gray-400 mb-3 uppercase tracking-wide">Preview</p>
+            <p className="text-xs text-gray-400 mb-3 uppercase tracking-wide">{t('settings.preview')}</p>
             <div className="space-y-4">
               <div>
-                <p className="text-xs text-gray-500 mb-1">English</p>
+                <p className="text-xs text-gray-500 mb-1">{t('settings.english')}</p>
                 <h3 className="text-2xl font-bold text-white">{settings.hero_title.en}</h3>
                 <p className="text-gray-300 mt-1">{settings.hero_subtitle.en}</p>
               </div>
               <div className="border-t border-gray-700 pt-4">
-                <p className="text-xs text-gray-500 mb-1">ລາວ</p>
+                <p className="text-xs text-gray-500 mb-1">{t('settings.lao')}</p>
                 <h3 className="text-2xl font-bold text-white">{settings.hero_title.lo}</h3>
                 <p className="text-gray-300 mt-1">{settings.hero_subtitle.lo}</p>
               </div>
@@ -231,9 +273,9 @@ export default function SettingsPage() {
             className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
           >
             <MdRefresh className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
-            <span>Refresh</span>
+            <span>{t('settings.refresh')}</span>
           </button>
-          
+
           <button
             onClick={handleSave}
             disabled={saving}
@@ -242,12 +284,12 @@ export default function SettingsPage() {
             {saving ? (
               <>
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                <span>Saving...</span>
+                <span>{t('settings.saving')}</span>
               </>
             ) : (
               <>
                 <MdSave className="w-5 h-5" />
-                <span>Save Changes</span>
+                <span>{t('settings.saveChanges')}</span>
               </>
             )}
           </button>
@@ -256,4 +298,3 @@ export default function SettingsPage() {
     </div>
   );
 }
-

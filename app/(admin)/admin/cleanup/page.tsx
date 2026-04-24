@@ -1,9 +1,11 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { MdCleaningServices, MdRefresh, MdDelete, MdWarning } from 'react-icons/md';
 import { toast } from 'sonner';
 import { useConfirm } from '../components/DialogProvider';
+import { formatDateTime } from '@/app/utils';
 
 type Orphan = {
   key: string;
@@ -27,11 +29,8 @@ function formatBytes(n: number): string {
   return `${(n / 1024 / 1024).toFixed(2)} MB`;
 }
 
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleString();
-}
-
 export default function CleanupPage() {
+  const { t } = useTranslation();
   const confirm = useConfirm();
   const [minAgeHours, setMinAgeHours] = useState<number>(24);
   const [scanning, setScanning] = useState(false);
@@ -84,10 +83,10 @@ export default function CleanupPage() {
     if (selected.size === 0) return;
     const count = selected.size;
     const ok = await confirm({
-      title: `Permanently delete ${count} object${count === 1 ? '' : 's'}?`,
-      description: `${formatBytes(selectedBytes)} will be removed from MinIO. This cannot be undone.`,
+      title: t('cleanup.deleteConfirmTitle', { count }),
+      description: t('cleanup.deleteConfirmDescription', { size: formatBytes(selectedBytes) }),
       variant: 'danger',
-      confirmLabel: 'Delete',
+      confirmLabel: t('cleanup.delete'),
     });
     if (!ok) return;
 
@@ -102,9 +101,9 @@ export default function CleanupPage() {
       const json = await res.json();
       if (!res.ok || !json.success) throw new Error(json.error || 'delete failed');
       toast.success(
-        `Deleted ${json.deleted} object${json.deleted === 1 ? '' : 's'}` +
+        t('cleanup.deleted', { count: json.deleted }) +
           (json.skippedNowReferenced?.length
-            ? `; skipped ${json.skippedNowReferenced.length} now-referenced`
+            ? t('cleanup.skippedSuffix', { count: json.skippedNowReferenced.length })
             : ''),
       );
       setSelected(new Set());
@@ -120,20 +119,19 @@ export default function CleanupPage() {
     <div className="max-w-6xl">
       <div className="flex items-center gap-3 mb-4">
         <MdCleaningServices className="w-7 h-7 text-primary" />
-        <h1 className="text-2xl font-bold text-gray-800">Storage cleanup</h1>
+        <h1 className="text-2xl font-bold text-gray-800">{t('cleanup.title')}</h1>
       </div>
 
-      <p className="text-gray-600 mb-6">
-        Scans <code className="bg-gray-100 px-1 rounded">insurances/</code> in MinIO and lists objects
-        that are <b>not referenced</b> by any insurance content, company logo, or setting. Only objects
-        older than the minimum age will appear, so in-flight edits are safe.
-      </p>
+      <p
+        className="text-gray-600 mb-6"
+        dangerouslySetInnerHTML={{ __html: t('cleanup.description') }}
+      />
 
       <div className="bg-white border border-gray-200 rounded-lg p-4 mb-4">
         <div className="flex flex-wrap items-end gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Minimum age (hours)
+              {t('cleanup.minAgeHours')}
             </label>
             <input
               type="number"
@@ -143,7 +141,7 @@ export default function CleanupPage() {
               onChange={(e) => setMinAgeHours(Math.max(0, parseFloat(e.target.value) || 0))}
               className="w-32 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
             />
-            <p className="text-xs text-gray-500 mt-1">Skip objects uploaded within this window.</p>
+            <p className="text-xs text-gray-500 mt-1">{t('cleanup.minAgeHint')}</p>
           </div>
           <button
             onClick={scan}
@@ -151,7 +149,7 @@ export default function CleanupPage() {
             className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <MdRefresh className={`w-5 h-5 ${scanning ? 'animate-spin' : ''}`} />
-            {scanning ? 'Scanning…' : 'Scan'}
+            {scanning ? t('cleanup.scanning') : t('cleanup.scan')}
           </button>
           {[1, 24, 168].map((h) => (
             <button
@@ -163,7 +161,7 @@ export default function CleanupPage() {
                   : 'border-gray-300 text-gray-600 hover:bg-gray-50'
               }`}
             >
-              {h === 1 ? '1h' : h === 24 ? '24h' : '7d'}
+              {h === 1 ? t('cleanup.presets.1h') : h === 24 ? t('cleanup.presets.24h') : t('cleanup.presets.7d')}
             </button>
           ))}
         </div>
@@ -180,13 +178,19 @@ export default function CleanupPage() {
         <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
           <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-b border-gray-200">
             <div className="text-sm text-gray-700">
-              <b>{result.count}</b> orphan{result.count === 1 ? '' : 's'} found ·{' '}
-              <b>{formatBytes(result.totalBytes)}</b> total
+              <span
+                dangerouslySetInnerHTML={{
+                  __html: t('cleanup.orphansFound', {
+                    count: result.count,
+                    size: formatBytes(result.totalBytes),
+                  }),
+                }}
+              />
               {selected.size > 0 && (
                 <>
                   {' · '}
                   <span className="text-primary">
-                    {selected.size} selected ({formatBytes(selectedBytes)})
+                    {t('cleanup.selectedSummary', { count: selected.size, size: formatBytes(selectedBytes) })}
                   </span>
                 </>
               )}
@@ -197,13 +201,13 @@ export default function CleanupPage() {
               className="flex items-center gap-2 px-4 py-2 bg-secondary text-white rounded-lg hover:bg-secondary-dark disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <MdDelete className="w-5 h-5" />
-              {deleting ? 'Deleting…' : `Delete selected (${selected.size})`}
+              {deleting ? t('cleanup.deleting') : t('cleanup.deleteSelected', { count: selected.size })}
             </button>
           </div>
 
           {result.orphans.length === 0 ? (
             <div className="p-8 text-center text-gray-500">
-              No orphans found. Bucket is clean.
+              {t('cleanup.noOrphans')}
             </div>
           ) : (
             <table className="w-full text-sm">
@@ -216,10 +220,10 @@ export default function CleanupPage() {
                       onChange={toggleAll}
                     />
                   </th>
-                  <th className="px-4 py-2 w-20">Preview</th>
-                  <th className="px-4 py-2">Key</th>
-                  <th className="px-4 py-2 w-24 text-right">Size</th>
-                  <th className="px-4 py-2 w-48">Last modified</th>
+                  <th className="px-4 py-2 w-20">{t('cleanup.columns.preview')}</th>
+                  <th className="px-4 py-2">{t('cleanup.columns.key')}</th>
+                  <th className="px-4 py-2 w-24 text-right">{t('cleanup.columns.size')}</th>
+                  <th className="px-4 py-2 w-48">{t('cleanup.columns.lastModified')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -263,7 +267,7 @@ export default function CleanupPage() {
                       </a>
                     </td>
                     <td className="px-4 py-2 text-right text-gray-600">{formatBytes(o.size)}</td>
-                    <td className="px-4 py-2 text-gray-600">{formatDate(o.lastModified)}</td>
+                    <td className="px-4 py-2 text-gray-600">{formatDateTime(o.lastModified)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -273,9 +277,10 @@ export default function CleanupPage() {
       )}
 
       {!result && !scanning && (
-        <div className="bg-gray-50 border border-dashed border-gray-300 rounded-lg p-8 text-center text-gray-500">
-          Click <b>Scan</b> to find orphaned objects.
-        </div>
+        <div
+          className="bg-gray-50 border border-dashed border-gray-300 rounded-lg p-8 text-center text-gray-500"
+          dangerouslySetInnerHTML={{ __html: t('cleanup.scanPrompt') }}
+        />
       )}
     </div>
   );

@@ -14,6 +14,7 @@ import {
   type ReactNode,
 } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import {
   MdAdd,
   MdArrowDownward,
@@ -85,7 +86,12 @@ const DEFAULT_PER_PAGE = 20;
 const DEFAULT_PAGE_SIZES = [10, 20, 50, 100];
 const SEARCH_DEBOUNCE_MS = 300;
 
-function renderCellValue(column: DataColumn, row: any): ReactNode {
+function renderCellValue(
+  column: DataColumn,
+  row: any,
+  yesLabel: string,
+  noLabel: string
+): ReactNode {
   if (column.render) return column.render(row);
   const value = row[column.key];
   if (value === null || value === undefined) return '—';
@@ -99,7 +105,7 @@ function renderCellValue(column: DataColumn, row: any): ReactNode {
   if (typeof value === 'object') {
     return value.name || value.title || value.label || JSON.stringify(value);
   }
-  if (typeof value === 'boolean') return value ? 'Yes' : 'No';
+  if (typeof value === 'boolean') return value ? yesLabel : noLabel;
   return String(value);
 }
 
@@ -107,6 +113,7 @@ function DataTableInner<T extends Record<string, any>>(
   props: DataTableProps<T>,
   forwardedRef: ForwardedRef<DataTableHandle>
 ) {
+  const { t } = useTranslation();
   const {
     fetchUrl,
     staticParams,
@@ -119,7 +126,7 @@ function DataTableInner<T extends Record<string, any>>(
     actions,
     selection,
     onCreate,
-    createLabel = 'Create',
+    createLabel = t('table.create'),
     toolbarExtras,
     emptyMessage,
     urlSync,
@@ -438,7 +445,7 @@ function DataTableInner<T extends Record<string, any>>(
               <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
-                placeholder={search.placeholder ?? 'Search...'}
+                placeholder={search.placeholder ?? `${t('common.search')}...`}
                 value={qInput}
                 onChange={(e) => setQInput(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
@@ -475,7 +482,7 @@ function DataTableInner<T extends Record<string, any>>(
           {/* Count + actions */}
           <div className="flex items-center gap-3 lg:ml-auto">
             <span className="text-sm text-gray-600 whitespace-nowrap">
-              {loading ? 'Loading…' : `${total} total`}
+              {loading ? t('table.loading') : `${total} ${t('table.totalSuffix')}`}
             </span>
             {toolbarExtras}
             {onCreate && (
@@ -496,14 +503,14 @@ function DataTableInner<T extends Record<string, any>>(
         <div className="flex items-center justify-between bg-primary/5 border border-primary/20 rounded-lg px-4 py-2">
           <div className="flex items-center gap-3">
             <span className="text-sm font-medium text-gray-900">
-              {selectedIds.size} selected
+              {t('table.selectedCount', { count: selectedIds.size })}
             </span>
             <button
               onClick={clearSelection}
               className="text-xs text-gray-600 hover:text-gray-900 inline-flex items-center gap-1"
             >
               <MdClose className="w-3.5 h-3.5" />
-              Clear
+              {t('table.clear')}
             </button>
           </div>
           <div className="flex items-center gap-2">
@@ -525,7 +532,7 @@ function DataTableInner<T extends Record<string, any>>(
             className="inline-flex items-center gap-1 text-sm font-medium text-red-700 hover:text-red-900"
           >
             <MdRefresh className="w-4 h-4" />
-            Retry
+            {t('table.retry')}
           </button>
         </div>
       )}
@@ -535,7 +542,7 @@ function DataTableInner<T extends Record<string, any>>(
         {loading && data.length === 0 ? (
           <div className="p-12 text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto" />
-            <p className="text-gray-600 mt-4">Loading…</p>
+            <p className="text-gray-600 mt-4">{t('table.loading')}</p>
           </div>
         ) : data.length === 0 ? (
           <div className="p-12 text-center">
@@ -543,19 +550,19 @@ function DataTableInner<T extends Record<string, any>>(
               <MdFilterList className="w-16 h-16 mx-auto" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              {filtersActive ? 'No matches' : emptyMessage ?? 'No items found'}
+              {filtersActive ? t('table.noMatches') : emptyMessage ?? t('table.noItems')}
             </h3>
             <p className="text-gray-600 mb-6">
               {filtersActive
-                ? 'Try adjusting your search or filters.'
-                : 'Get started by creating your first item.'}
+                ? t('table.tryAdjustFilters')
+                : t('table.getStartedCreate')}
             </p>
             {filtersActive ? (
               <button
                 onClick={clearFilters}
                 className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
               >
-                Clear filters
+                {t('table.clearFilters')}
               </button>
             ) : (
               onCreate && (
@@ -583,7 +590,7 @@ function DataTableInner<T extends Record<string, any>>(
                     <th className="px-4 py-3 w-10">
                       <input
                         type="checkbox"
-                        aria-label="Select page"
+                        aria-label={t('table.selectPage')}
                         checked={pageAllSelected}
                         ref={(el) => {
                           if (el) el.indeterminate = pageSomeSelected;
@@ -623,7 +630,7 @@ function DataTableInner<T extends Record<string, any>>(
                   })}
                   {actions && (
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
+                      {t('table.actions')}
                     </th>
                   )}
                 </tr>
@@ -642,7 +649,7 @@ function DataTableInner<T extends Record<string, any>>(
                         <td className="px-4 py-4 w-10">
                           <input
                             type="checkbox"
-                            aria-label={`Select row ${rowId}`}
+                            aria-label={t('table.selectRow', { id: rowId })}
                             checked={checked}
                             disabled={!selectable}
                             onChange={() => toggleRowSelection(row)}
@@ -657,7 +664,7 @@ function DataTableInner<T extends Record<string, any>>(
                             column.className ?? ''
                           }`}
                         >
-                          {renderCellValue(column, row)}
+                          {renderCellValue(column, row, t('common.yes'), t('common.no'))}
                         </td>
                       ))}
                       {actions && (
@@ -680,14 +687,14 @@ function DataTableInner<T extends Record<string, any>>(
       {paginationEnabled && data.length > 0 && (
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-sm text-gray-600">
           <div>
-            Showing <span className="font-semibold">{rangeStart}</span>–
-            <span className="font-semibold">{rangeEnd}</span> of{' '}
+            {t('table.showing')} <span className="font-semibold">{rangeStart}</span>–
+            <span className="font-semibold">{rangeEnd}</span> {t('table.of')}{' '}
             <span className="font-semibold">{total}</span>
           </div>
           <div className="flex items-center gap-3">
             {pageSizeOptions.length > 0 && (
               <label className="flex items-center gap-2">
-                <span className="text-xs text-gray-500">Per page</span>
+                <span className="text-xs text-gray-500">{t('table.perPage')}</span>
                 <select
                   value={perPage}
                   onChange={(e) => {
@@ -725,6 +732,7 @@ function PageNumbers({
   totalPages: number;
   onChange: (p: number) => void;
 }) {
+  const { t } = useTranslation();
   const pages: (number | 'ellipsis')[] = [];
   const add = (n: number | 'ellipsis') => pages.push(n);
   if (totalPages <= 7) {
@@ -745,7 +753,7 @@ function PageNumbers({
         onClick={() => onChange(Math.max(1, page - 1))}
         disabled={page === 1}
         className="p-1.5 rounded border border-gray-300 disabled:opacity-40 hover:bg-gray-100"
-        aria-label="Previous page"
+        aria-label={t('table.previousPage')}
       >
         <MdChevronLeft className="w-4 h-4" />
       </button>
@@ -772,7 +780,7 @@ function PageNumbers({
         onClick={() => onChange(Math.min(totalPages, page + 1))}
         disabled={page === totalPages}
         className="p-1.5 rounded border border-gray-300 disabled:opacity-40 hover:bg-gray-100"
-        aria-label="Next page"
+        aria-label={t('table.nextPage')}
       >
         <MdChevronRight className="w-4 h-4" />
       </button>

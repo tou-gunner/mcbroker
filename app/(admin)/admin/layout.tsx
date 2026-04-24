@@ -1,10 +1,19 @@
 'use client';
 
 import "../../globals.css";
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { Noto_Sans_Lao } from 'next/font/google';
 import { usePathname, useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
+
+const notoSansLao = Noto_Sans_Lao({
+  subsets: ['lao'],
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
+});
 import { Toaster } from 'sonner';
 import { DialogProvider } from './components/DialogProvider';
+import I18nProvider from './i18n/I18nProvider';
 import {
   MdDashboard,
   MdDescription,
@@ -26,17 +35,18 @@ interface AdminLayoutProps {
 }
 
 const menuItems = [
-  { icon: MdDashboard, label: 'Dashboard', href: '/admin/dashboard' },
-  { icon: MdDescription, label: 'Insurance Plans', href: '/admin/insurances' },
-  { icon: MdBusiness, label: 'Companies', href: '/admin/companies' },
-  { icon: MdImage, label: 'Banners', href: '/admin/banners' },
-  { icon: MdPeople, label: 'Customers', href: '/admin/customers' },
-  { icon: MdShield, label: 'Claims', href: '/admin/claims' },
-  { icon: MdSettings, label: 'Settings', href: '/admin/settings' },
-  { icon: MdCleaningServices, label: 'Cleanup', href: '/admin/cleanup' },
-];
+  { icon: MdDashboard, key: 'dashboard', href: '/admin/dashboard' },
+  { icon: MdDescription, key: 'insurancePlans', href: '/admin/insurances' },
+  { icon: MdBusiness, key: 'companies', href: '/admin/companies' },
+  { icon: MdImage, key: 'banners', href: '/admin/banners' },
+  { icon: MdPeople, key: 'customers', href: '/admin/customers' },
+  { icon: MdShield, key: 'claims', href: '/admin/claims' },
+  { icon: MdSettings, key: 'settings', href: '/admin/settings' },
+  { icon: MdCleaningServices, key: 'cleanup', href: '/admin/cleanup' },
+] as const;
 
-export default function AdminLayout({ children }: AdminLayoutProps) {
+function AdminShell({ children }: AdminLayoutProps) {
+  const { t } = useTranslation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [adminEmail, setAdminEmail] = useState<string | null>(null);
   const pathname = usePathname();
@@ -68,20 +78,26 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     router.refresh();
   };
 
+  const items = useMemo(
+    () =>
+      menuItems.map((item) => ({
+        ...item,
+        label: t(`nav.${item.key}`),
+      })),
+    [t]
+  );
+
   if (isLoginPage) {
     return (
-      <html>
-        <body>
-          {children}
-          <Toaster richColors position="top-right" />
-        </body>
-      </html>
+      <>
+        {children}
+        <Toaster richColors position="top-right" />
+      </>
     );
   }
 
-  return (<html>
-    <body>
-      <DialogProvider>
+  return (
+    <DialogProvider>
       <div className="min-h-screen bg-gray-50">
         {/* Sidebar */}
         <aside
@@ -94,7 +110,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             <div className="flex items-center justify-between p-4 border-b border-gray-200">
               <div className="flex items-center space-x-2">
                 <MdShield className="w-8 h-8 text-primary" />
-                <span className="text-xl font-bold text-gray-800">MC Admin</span>
+                <span className="text-xl font-bold text-gray-800">{t('nav.brand')}</span>
               </div>
               <button
                 onClick={() => setSidebarOpen(false)}
@@ -106,10 +122,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
             {/* Navigation */}
             <nav className="flex-1 overflow-y-auto p-4 space-y-2">
-              {menuItems.map((item) => {
+              {items.map((item) => {
                 const Icon = item.icon;
                 const isActive = pathname?.includes(item.href);
-                
+
                 return (
                   <button
                     key={item.href}
@@ -134,7 +150,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 className="w-full flex items-center space-x-3 px-4 py-3 text-secondary hover:bg-secondary/10 rounded-lg transition-colors"
               >
                 <MdLogout className="w-5 h-5" />
-                <span className="font-medium">Logout</span>
+                <span className="font-medium">{t('nav.logout')}</span>
               </button>
             </div>
           </div>
@@ -158,7 +174,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   <MdSearch className="w-5 h-5 text-gray-400 mr-2" />
                   <input
                     type="text"
-                    placeholder="Search..."
+                    placeholder={t('nav.searchPlaceholder')}
                     className="bg-transparent outline-none text-gray-700 w-full"
                   />
                 </div>
@@ -181,9 +197,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   </div>
                   <div className="hidden md:block">
                     <p className="text-sm font-medium text-gray-700">
-                      {adminEmail ?? 'Loading…'}
+                      {adminEmail ?? t('common.loading')}
                     </p>
-                    <p className="text-xs text-gray-500">Administrator</p>
+                    <p className="text-xs text-gray-500">{t('nav.administrator')}</p>
                   </div>
                 </div>
               </div>
@@ -205,7 +221,18 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         )}
       </div>
       <Toaster richColors position="top-right" />
-      </DialogProvider>
-    </body>
-  </html>);
+    </DialogProvider>
+  );
+}
+
+export default function AdminLayout({ children }: AdminLayoutProps) {
+  return (
+    <html>
+      <body className={notoSansLao.className}>
+        <I18nProvider>
+          <AdminShell>{children}</AdminShell>
+        </I18nProvider>
+      </body>
+    </html>
+  );
 }

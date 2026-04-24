@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import Image from 'next/image';
 import {
   MdSave,
@@ -56,6 +57,7 @@ interface InsuranceRow {
 }
 
 export default function CompanyEditorPage() {
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const params = useParams();
   const confirm = useConfirm();
@@ -104,17 +106,17 @@ export default function CompanyEditorPage() {
           ],
         });
       } else {
-        toast.error('Failed to load company');
+        toast.error(t('companies.editor.loadFailed'));
         router.push('/admin/companies');
       }
     } catch (error) {
       console.error('Error fetching company:', error);
-      toast.error('Error loading company');
+      toast.error(t('companies.editor.loadError'));
       router.push('/admin/companies');
     } finally {
       setLoading(false);
     }
-  }, [isEdit, companyId, router]);
+  }, [isEdit, companyId, router, t]);
 
   useEffect(() => {
     fetchCompany();
@@ -148,11 +150,11 @@ export default function CompanyEditorPage() {
   const handleSave = async () => {
     const enName = formData.metadata.find((m) => m.locale === 'en')?.name?.trim();
     if (!enName) {
-      toast.error('English name is required');
+      toast.error(t('companies.editor.englishNameRequired'));
       return;
     }
     if (!formData.slug.trim()) {
-      toast.error('Slug is required');
+      toast.error(t('companies.editor.slugRequired'));
       return;
     }
 
@@ -173,12 +175,12 @@ export default function CompanyEditorPage() {
         });
         const result = await res.json();
         if (result.success) {
-          toast.success('Company created. Upload a logo next.');
+          toast.success(t('companies.editor.createdSuccess'));
           router.push(`/admin/companies/${result.data.id}`);
         } else if (res.status === 409) {
-          toast.error('Slug already in use');
+          toast.error(t('companies.editor.slugInUse'));
         } else {
-          toast.error(`Failed to create: ${result.error || 'Unknown error'}`);
+          toast.error(t('companies.editor.createFailed', { error: result.error || 'Unknown error' }));
         }
       } else {
         const res = await fetch(`/api/admin/companies/${companyId}`, {
@@ -194,17 +196,17 @@ export default function CompanyEditorPage() {
         });
         const result = await res.json();
         if (result.success) {
-          toast.success('Company updated');
+          toast.success(t('companies.editor.updatedSuccess'));
           fetchCompany();
         } else if (res.status === 409) {
-          toast.error('Slug already in use');
+          toast.error(t('companies.editor.slugInUse'));
         } else {
-          toast.error(`Failed to update: ${result.error || 'Unknown error'}`);
+          toast.error(t('companies.editor.updateFailed', { error: result.error || 'Unknown error' }));
         }
       }
     } catch (error) {
       console.error('Error saving company:', error);
-      toast.error('Failed to save');
+      toast.error(t('companies.editor.saveFailed'));
     } finally {
       setSaving(false);
     }
@@ -219,23 +221,23 @@ export default function CompanyEditorPage() {
       });
       const result = await res.json();
       if (result.success) {
-        toast.success('Logo uploaded');
+        toast.success(t('companies.editor.logoUploaded'));
         fetchCompany();
       } else {
-        toast.error('Logo upload succeeded but DB update failed');
+        toast.error(t('companies.editor.logoUploadDbFailed'));
       }
     } catch (error) {
       console.error('Error updating logo:', error);
-      toast.error('Error attaching logo');
+      toast.error(t('companies.editor.logoAttachError'));
     }
   };
 
   const handleLogoDelete = async () => {
     const ok = await confirm({
-      title: 'Remove logo?',
-      description: 'The logo file will be deleted from storage.',
+      title: t('companies.editor.removeLogoTitle'),
+      description: t('companies.editor.removeLogoDescription'),
       variant: 'danger',
-      confirmLabel: 'Remove',
+      confirmLabel: t('companies.editor.removeLogoConfirm'),
     });
     if (!ok) return;
 
@@ -245,14 +247,14 @@ export default function CompanyEditorPage() {
       });
       const result = await res.json();
       if (result.success) {
-        toast.success('Logo removed');
+        toast.success(t('companies.editor.logoRemoved'));
         fetchCompany();
       } else {
-        toast.error(`Failed: ${result.error}`);
+        toast.error(t('companies.deleteFailed', { error: result.error }));
       }
     } catch (error) {
       console.error('Error deleting logo:', error);
-      toast.error('Error removing logo');
+      toast.error(t('companies.editor.logoRemoveError'));
     }
   };
 
@@ -260,19 +262,16 @@ export default function CompanyEditorPage() {
     if (!company) return;
     if (company.insuranceCount > 0) {
       toast.error(
-        `Cannot delete: ${company.insuranceCount} linked insurance${
-          company.insuranceCount === 1 ? '' : 's'
-        }. Remove them first.`
+        t('companies.editor.cannotDeleteWithLinks', { count: company.insuranceCount })
       );
       return;
     }
 
     const ok = await confirm({
-      title: 'Delete this company permanently?',
-      description:
-        'This cannot be undone. The company, its metadata, and its logo file will be removed. Prefer Archive if you want to hide it temporarily.',
+      title: t('companies.editor.deleteConfirmTitle'),
+      description: t('companies.editor.deleteConfirmDescription'),
       variant: 'danger',
-      confirmLabel: 'Delete permanently',
+      confirmLabel: t('companies.deleteConfirmLabel'),
     });
     if (!ok) return;
 
@@ -282,26 +281,28 @@ export default function CompanyEditorPage() {
       });
       const result = await res.json();
       if (result.success) {
-        toast.success('Company deleted');
+        toast.success(t('companies.deleteSuccess'));
         router.push('/admin/companies');
       } else {
-        toast.error(`Failed: ${result.error}`);
+        toast.error(t('companies.deleteFailed', { error: result.error }));
       }
     } catch (error) {
       console.error('Error deleting company:', error);
-      toast.error('Error deleting company');
+      toast.error(t('companies.deleteError'));
     }
   };
 
   const handleToggleActive = async () => {
     const nextState = !formData.isActive;
     const ok = await confirm({
-      title: nextState ? 'Activate company?' : 'Archive company?',
+      title: nextState
+        ? t('companies.activateConfirmTitle')
+        : t('companies.archiveConfirmTitle'),
       description: nextState
-        ? 'Company will become visible on the public site.'
-        : 'Company will be hidden from the public site. You can restore it later.',
+        ? t('companies.activateDescription')
+        : t('companies.archiveDescription'),
       variant: nextState ? 'default' : 'danger',
-      confirmLabel: nextState ? 'Activate' : 'Archive',
+      confirmLabel: nextState ? t('companies.activate') : t('companies.archive'),
     });
     if (!ok) return;
 
@@ -313,14 +314,14 @@ export default function CompanyEditorPage() {
       });
       const result = await res.json();
       if (result.success) {
-        toast.success(nextState ? 'Activated' : 'Archived');
+        toast.success(nextState ? t('companies.activated') : t('companies.archived'));
         setFormData((prev) => ({ ...prev, isActive: nextState }));
       } else {
-        toast.error(`Failed: ${result.error}`);
+        toast.error(t('companies.deleteFailed', { error: result.error }));
       }
     } catch (error) {
       console.error('Error toggling active:', error);
-      toast.error('Error updating status');
+      toast.error(t('companies.statusUpdateError'));
     }
   };
 
@@ -329,7 +330,7 @@ export default function CompanyEditorPage() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto"></div>
-          <p className="text-gray-600 mt-4">Loading company...</p>
+          <p className="text-gray-600 mt-4">{t('companies.editor.loading')}</p>
         </div>
       </div>
     );
@@ -337,27 +338,30 @@ export default function CompanyEditorPage() {
 
   const currentMetadata = getCurrentMetadata();
 
-  const insuranceColumns: DataColumn<InsuranceRow>[] = [
-    { key: 'name', label: 'Name' },
-    { key: 'slug', label: 'Slug', sortable: true },
-    {
-      key: 'status',
-      label: 'Status',
-      sortable: true,
-      render: (i) => (
-        <span
-          className={`text-sm font-medium ${
-            i.status === 'PUBLISHED' ? 'text-green-600' : 'text-red-600'
-          }`}
-        >
-          {i.status}
-        </span>
-      ),
-    },
-    { key: 'featured', label: 'Featured', sortable: true },
-    { key: 'category', label: 'Category' },
-    { key: 'updatedAt', label: 'Updated', sortable: true },
-  ];
+  const insuranceColumns: DataColumn<InsuranceRow>[] = useMemo(
+    () => [
+      { key: 'name', label: t('insurances.columns.name') },
+      { key: 'slug', label: t('insurances.columns.slug'), sortable: true },
+      {
+        key: 'status',
+        label: t('insurances.columns.status'),
+        sortable: true,
+        render: (i) => (
+          <span
+            className={`text-sm font-medium ${
+              i.status === 'PUBLISHED' ? 'text-green-600' : 'text-red-600'
+            }`}
+          >
+            {i.status}
+          </span>
+        ),
+      },
+      { key: 'featured', label: t('insurances.columns.featured'), sortable: true },
+      { key: 'category', label: t('insurances.columns.category') },
+      { key: 'updatedAt', label: t('companies.columns.updated'), sortable: true },
+    ],
+    [t]
+  );
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
@@ -372,12 +376,12 @@ export default function CompanyEditorPage() {
           </button>
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
-              {isEdit ? 'Edit Company' : 'Create Company'}
+              {isEdit ? t('companies.editor.editTitle') : t('companies.editor.createTitle')}
             </h1>
             <p className="text-gray-600 mt-1">
               {isEdit
-                ? 'Update company details and logo'
-                : 'Add a new insurance provider'}
+                ? t('companies.editor.editSubtitle')
+                : t('companies.editor.createSubtitle')}
             </p>
           </div>
         </div>
@@ -387,10 +391,10 @@ export default function CompanyEditorPage() {
             <button
               onClick={handleHardDelete}
               className="flex items-center space-x-2 px-4 py-2 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 transition-colors"
-              title="Delete permanently"
+              title={t('companies.deletePermanently')}
             >
               <MdDeleteForever className="w-5 h-5" />
-              <span>Delete</span>
+              <span>{t('common.delete')}</span>
             </button>
           )}
           {isEdit && (
@@ -402,7 +406,7 @@ export default function CompanyEditorPage() {
                   : 'border-green-600 text-green-700 hover:bg-green-50'
               }`}
             >
-              {formData.isActive ? 'Archive' : 'Activate'}
+              {formData.isActive ? t('companies.archive') : t('companies.activate')}
             </button>
           )}
           <button
@@ -411,17 +415,23 @@ export default function CompanyEditorPage() {
             className="flex items-center space-x-2 px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-50"
           >
             <MdSave className="w-5 h-5" />
-            <span>{saving ? 'Saving...' : isEdit ? 'Save Changes' : 'Create'}</span>
+            <span>
+              {saving
+                ? t('common.saving')
+                : isEdit
+                ? t('companies.editor.saveChanges')
+                : t('companies.editor.create')}
+            </span>
           </button>
         </div>
       </div>
 
       {/* Status banner */}
       {isEdit && !formData.isActive && (
-        <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg px-4 py-3 text-sm">
-          This company is currently <strong>archived</strong>. It is hidden from
-          the public site until you activate it.
-        </div>
+        <div
+          className="bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg px-4 py-3 text-sm"
+          dangerouslySetInnerHTML={{ __html: t('companies.editor.archivedBanner') }}
+        />
       )}
 
       {/* Locale tabs + fields */}
@@ -437,7 +447,7 @@ export default function CompanyEditorPage() {
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              {locale === 'en' ? 'English' : 'ລາວ (Lao)'}
+              {locale === 'en' ? t('companies.editor.english') : t('companies.editor.lao')}
             </button>
           ))}
         </div>
@@ -445,7 +455,10 @@ export default function CompanyEditorPage() {
         <div className="p-6 space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Company Name ({currentLocale.toUpperCase()}) {currentLocale === 'en' && '*'}
+              {t('companies.editor.companyName', {
+                locale: currentLocale.toUpperCase(),
+                required: currentLocale === 'en' ? ' *' : '',
+              })}
             </label>
             <input
               type="text"
@@ -454,13 +467,13 @@ export default function CompanyEditorPage() {
                 updateMetadata(currentLocale, 'name', e.target.value)
               }
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-              placeholder="e.g., Allianz Insurance"
+              placeholder={t('companies.editor.companyNamePlaceholder')}
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Description ({currentLocale.toUpperCase()})
+              {t('companies.editor.description', { locale: currentLocale.toUpperCase() })}
             </label>
             <textarea
               value={currentMetadata.description}
@@ -469,14 +482,14 @@ export default function CompanyEditorPage() {
               }
               rows={4}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-              placeholder="Brief description shown on the company page"
+              placeholder={t('companies.editor.descriptionPlaceholder')}
             />
           </div>
 
           {currentLocale === 'en' && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                URL Slug *
+                {t('companies.editor.urlSlug')}
               </label>
               <input
                 type="text"
@@ -491,7 +504,7 @@ export default function CompanyEditorPage() {
                   })
                 }
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent font-mono text-sm"
-                placeholder="company-slug"
+                placeholder={t('companies.editor.urlSlugPlaceholder')}
               />
             </div>
           )}
@@ -500,11 +513,11 @@ export default function CompanyEditorPage() {
 
       {/* Logo section */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">Logo</h2>
+        <h2 className="text-lg font-semibold text-gray-800 mb-4">{t('companies.editor.logo')}</h2>
 
         {!isEdit ? (
           <p className="text-sm text-gray-500">
-            Save the company first, then upload a logo.
+            {t('companies.editor.logoSaveFirst')}
           </p>
         ) : formData.logo ? (
           <div className="flex items-start gap-6">
@@ -528,10 +541,10 @@ export default function CompanyEditorPage() {
                 className="inline-flex items-center gap-1 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded border border-red-200 w-max"
               >
                 <MdDelete className="w-4 h-4" />
-                Remove logo
+                {t('companies.editor.removeLogo')}
               </button>
               <p className="text-xs text-gray-500">
-                Uploading replaces the current logo.
+                {t('companies.editor.logoReplaceHint')}
               </p>
             </div>
           </div>
@@ -543,7 +556,7 @@ export default function CompanyEditorPage() {
               onUploaded={(url) => handleLogoUploaded(url)}
             />
             <p className="text-xs text-gray-500">
-              Recommended square or landscape image, ≤10MB.
+              {t('companies.editor.logoSizeHint')}
             </p>
           </div>
         )}
@@ -554,27 +567,27 @@ export default function CompanyEditorPage() {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="mb-4">
             <h2 className="text-lg font-semibold text-gray-800">
-              Insurances
+              {t('companies.editor.insurancesTitle')}
             </h2>
             <p className="text-sm text-gray-500 mt-1">
-              Insurance products linked to this company.
+              {t('companies.editor.insurancesSubtitle')}
             </p>
           </div>
 
           <DataTable<InsuranceRow>
             fetchUrl="/api/admin/insurances"
-            staticParams={{ locale: 'en', companyId }}
+            staticParams={{ locale: i18n.language, companyId }}
             keyColumn="id"
             columns={insuranceColumns}
-            search={{ placeholder: 'Search insurances in this company...' }}
+            search={{ placeholder: t('companies.editor.insurancesSearchPlaceholder') }}
             pagination={{ perPage: 10 }}
             urlSync={false}
-            emptyMessage="No insurances linked to this company yet."
+            emptyMessage={t('companies.editor.insurancesEmpty')}
             actions={(i) => (
               <button
                 onClick={() => router.push(`/admin/insurances/${i.id}`)}
                 className="p-1.5 text-primary hover:bg-primary/10 rounded transition-colors"
-                title="Edit"
+                title={t('common.edit')}
               >
                 <MdEdit className="w-4 h-4" />
               </button>
@@ -587,15 +600,15 @@ export default function CompanyEditorPage() {
       {isEdit && company && (
         <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-xs text-gray-600 flex flex-wrap gap-x-6 gap-y-1">
           <span>
-            Insurances linked: <strong>{company.insuranceCount}</strong>
+            {t('companies.editor.auditInsurancesLinked')}: <strong>{company.insuranceCount}</strong>
           </span>
           <span>
-            Created: {formatDateTime(company.createdAt)}
-            {company.createdBy ? ` by ${company.createdBy}` : ''}
+            {t('companies.editor.auditCreated')}: {formatDateTime(company.createdAt)}
+            {company.createdBy ? ` ${t('companies.editor.auditBy')} ${company.createdBy}` : ''}
           </span>
           <span>
-            Last updated: {formatDateTime(company.updatedAt)}
-            {company.updatedBy ? ` by ${company.updatedBy}` : ''}
+            {t('companies.editor.auditUpdated')}: {formatDateTime(company.updatedAt)}
+            {company.updatedBy ? ` ${t('companies.editor.auditBy')} ${company.updatedBy}` : ''}
           </span>
         </div>
       )}

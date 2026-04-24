@@ -1,7 +1,8 @@
 'use client';
 
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { MdEdit, MdDelete } from 'react-icons/md';
 import { toast } from 'sonner';
 import DataTable, {
@@ -31,16 +32,17 @@ interface Insurance {
 }
 
 export default function InsuranceListPage() {
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const confirm = useConfirm();
   const tableRef = useRef<DataTableHandle>(null);
 
   const handleDelete = async (id: string) => {
     const ok = await confirm({
-      title: 'Delete insurance?',
-      description: 'This action cannot be undone.',
+      title: t('insurances.deleteConfirmTitle'),
+      description: t('insurances.deleteConfirmDescription'),
       variant: 'danger',
-      confirmLabel: 'Delete',
+      confirmLabel: t('common.delete'),
     });
     if (!ok) return;
 
@@ -50,90 +52,91 @@ export default function InsuranceListPage() {
       });
       const result = await response.json();
       if (result.success) {
-        toast.success('Insurance deleted successfully');
+        toast.success(t('insurances.deleteSuccess'));
         tableRef.current?.reload();
       } else {
-        toast.error(`Failed to delete: ${result.error}`);
+        toast.error(t('insurances.deleteFailed', { error: result.error }));
       }
     } catch (error) {
       console.error('Error deleting insurance:', error);
-      toast.error('Error deleting insurance');
+      toast.error(t('insurances.deleteError'));
     }
   };
 
-  const columns: DataColumn<Insurance>[] = [
-    { key: 'name', label: 'Name' },
-    { key: 'slug', label: 'Slug', sortable: true },
-    {
-      key: 'status',
-      label: 'Status',
-      sortable: true,
-      render: (i) => (
-        <span
-          className={`text-sm font-medium ${
-            i.status === 'PUBLISHED' ? 'text-green-600' : 'text-red-600'
-          }`}
-        >
-          {i.status}
-        </span>
-      ),
-    },
-    { key: 'featured', label: 'Featured', sortable: true },
-    { key: 'category', label: 'Category' },
-    { key: 'company', label: 'Company' },
-    { key: 'createdAt', label: 'Created At', sortable: true },
-    { key: 'updatedAt', label: 'Updated At', sortable: true },
-  ];
+  const columns: DataColumn<Insurance>[] = useMemo(
+    () => [
+      { key: 'name', label: t('insurances.columns.name') },
+      { key: 'slug', label: t('insurances.columns.slug'), sortable: true },
+      {
+        key: 'status',
+        label: t('insurances.columns.status'),
+        sortable: true,
+        render: (i) => (
+          <span
+            className={`text-sm font-medium ${
+              i.status === 'PUBLISHED' ? 'text-green-600' : 'text-red-600'
+            }`}
+          >
+            {i.status}
+          </span>
+        ),
+      },
+      { key: 'featured', label: t('insurances.columns.featured'), sortable: true },
+      { key: 'category', label: t('insurances.columns.category') },
+      { key: 'company', label: t('insurances.columns.company') },
+      { key: 'createdAt', label: t('insurances.columns.createdAt'), sortable: true },
+      { key: 'updatedAt', label: t('insurances.columns.updatedAt'), sortable: true },
+    ],
+    [t]
+  );
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-gray-900">
-          Insurance Management
+          {t('insurances.title')}
         </h1>
-        <p className="text-gray-600 mt-1">
-          Manage insurance content and details
-        </p>
+        <p className="text-gray-600 mt-1">{t('insurances.subtitle')}</p>
       </div>
 
       <DataTable<Insurance>
         ref={tableRef}
         fetchUrl="/api/admin/insurances"
-        staticParams={{ locale: 'en' }}
+        staticParams={{ locale: i18n.language }}
         keyColumn="id"
         columns={columns}
-        search={{ placeholder: 'Search insurances...' }}
+        search={{ placeholder: t('insurances.searchPlaceholder') }}
         filters={[
           {
             key: 'status',
-            label: 'Status',
+            label: t('insurances.columns.status'),
             defaultValue: 'ALL',
             options: [
-              { value: 'ALL', label: 'All Status' },
-              { value: 'DRAFT', label: 'Draft' },
-              { value: 'PUBLISHED', label: 'Published' },
-              { value: 'ARCHIVED', label: 'Archived' },
-              { value: 'UNDER_REVIEW', label: 'Under Review' },
+              { value: 'ALL', label: t('insurances.status.all') },
+              { value: 'DRAFT', label: t('insurances.status.draft') },
+              { value: 'PUBLISHED', label: t('insurances.status.published') },
+              { value: 'ARCHIVED', label: t('insurances.status.archived') },
+              { value: 'UNDER_REVIEW', label: t('insurances.status.underReview') },
             ],
           },
         ]}
         pagination={{ perPage: 20 }}
         onCreate={() => router.push('/admin/insurances/create')}
-        createLabel="Create Insurance"
+        createLabel={t('insurances.createLabel')}
         urlSync
         actions={(i) => (
           <>
             <button
               onClick={() => router.push(`/admin/insurances/${i.id}`)}
               className="p-1.5 text-primary hover:bg-primary/10 rounded transition-colors"
-              title="Edit"
+              title={t('common.edit')}
             >
               <MdEdit className="w-4 h-4" />
             </button>
             <button
               onClick={() => handleDelete(i.id)}
               className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors"
-              title="Delete"
+              title={t('common.delete')}
             >
               <MdDelete className="w-4 h-4" />
             </button>

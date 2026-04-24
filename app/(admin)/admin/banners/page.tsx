@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Image from 'next/image';
 import { MdDelete, MdSave } from 'react-icons/md';
 import { toast } from 'sonner';
@@ -24,6 +25,7 @@ interface DraftFields {
 }
 
 export default function BannersPage() {
+  const { t } = useTranslation();
   const confirm = useConfirm();
   const [banners, setBanners] = useState<Banner[]>([]);
   const [drafts, setDrafts] = useState<Record<string, DraftFields>>({});
@@ -67,13 +69,13 @@ export default function BannersPage() {
       const result = await res.json();
       if (result.success) {
         fetchBanners();
-        toast.success('Banner uploaded');
+        toast.success(t('banners.uploaded'));
       } else {
-        toast.error(`Failed to create banner: ${result.error}`);
+        toast.error(t('banners.createFailed', { error: result.error }));
       }
     } catch (error) {
       console.error('Error creating banner:', error);
-      toast.error('Error creating banner');
+      toast.error(t('banners.createError'));
     }
   };
 
@@ -94,13 +96,13 @@ export default function BannersPage() {
       const result = await res.json();
       if (result.success) {
         setBanners((prev) => prev.map((b) => (b.id === id ? result.data : b)));
-        toast.success('Banner saved');
+        toast.success(t('banners.saved'));
       } else {
-        toast.error(`Failed to save: ${result.error}`);
+        toast.error(t('banners.saveFailed', { error: result.error }));
       }
     } catch (error) {
       console.error('Error saving banner:', error);
-      toast.error('Error saving banner');
+      toast.error(t('banners.saveError'));
     } finally {
       setSavingId(null);
     }
@@ -108,10 +110,10 @@ export default function BannersPage() {
 
   const handleDelete = async (id: string) => {
     const ok = await confirm({
-      title: 'Delete banner?',
-      description: 'This banner will be removed from the hero carousel immediately.',
+      title: t('banners.deleteConfirmTitle'),
+      description: t('banners.deleteConfirmDescription'),
       variant: 'danger',
-      confirmLabel: 'Delete',
+      confirmLabel: t('common.delete'),
     });
     if (!ok) return;
     try {
@@ -119,13 +121,13 @@ export default function BannersPage() {
       const result = await res.json();
       if (result.success) {
         setBanners((prev) => prev.filter((b) => b.id !== id));
-        toast.success('Banner deleted');
+        toast.success(t('banners.deleted'));
       } else {
-        toast.error(`Failed to delete: ${result.error}`);
+        toast.error(t('banners.deleteFailed', { error: result.error }));
       }
     } catch (error) {
       console.error('Error deleting banner:', error);
-      toast.error('Error deleting banner');
+      toast.error(t('banners.deleteError'));
     }
   };
 
@@ -147,32 +149,27 @@ export default function BannersPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Banners</h1>
-          <p className="text-gray-600 mt-1">
-            Manage hero carousel banners. Higher priority shows first.
-          </p>
+          <h1 className="text-3xl font-bold text-gray-900">{t('banners.title')}</h1>
+          <p className="text-gray-600 mt-1">{t('banners.subtitle')}</p>
         </div>
       </div>
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <h2 className="text-lg font-semibold text-gray-800 mb-3">
-          Upload new banner
+          {t('banners.uploadNew')}
         </h2>
         <ImageUpload scope="banner" onUploaded={(url) => handleUploaded(url)} />
-        <p className="text-xs text-gray-500 mt-2">
-          Recommended 1920×800, ≤10MB. Uploads are immediately created as active
-          banners.
-        </p>
+        <p className="text-xs text-gray-500 mt-2">{t('banners.sizeHint')}</p>
       </div>
 
       {loading ? (
         <div className="p-12 text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="text-gray-600 mt-4">Loading banners...</p>
+          <p className="text-gray-600 mt-4">{t('banners.loading')}</p>
         </div>
       ) : banners.length === 0 ? (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center text-gray-500">
-          No banners yet. Upload one above.
+          {t('banners.empty')}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -194,7 +191,7 @@ export default function BannersPage() {
                   />
                   {!draft.isActive && (
                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                      <span className="text-white font-semibold">Inactive</span>
+                      <span className="text-white font-semibold">{t('banners.inactive')}</span>
                     </div>
                   )}
                 </div>
@@ -202,7 +199,7 @@ export default function BannersPage() {
                 <div className="p-4 space-y-3 flex-1">
                   <div>
                     <label className="block text-xs font-medium text-gray-600 mb-1">
-                      Link URL (optional)
+                      {t('banners.linkUrl')}
                     </label>
                     <input
                       type="url"
@@ -210,7 +207,7 @@ export default function BannersPage() {
                       onChange={(e) =>
                         updateDraft(banner.id, { linkUrl: e.target.value })
                       }
-                      placeholder="https://..."
+                      placeholder={t('banners.linkUrlPlaceholder')}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-transparent"
                     />
                   </div>
@@ -218,7 +215,7 @@ export default function BannersPage() {
                   <div className="flex items-center gap-4">
                     <div className="flex-1">
                       <label className="block text-xs font-medium text-gray-600 mb-1">
-                        Priority
+                        {t('banners.priority')}
                       </label>
                       <input
                         type="number"
@@ -241,7 +238,7 @@ export default function BannersPage() {
                         }
                         className="w-4 h-4 text-primary rounded"
                       />
-                      Active
+                      {t('banners.active')}
                     </label>
                   </div>
                 </div>
@@ -252,7 +249,7 @@ export default function BannersPage() {
                     className="flex items-center gap-1 text-sm text-red-600 hover:text-red-700"
                   >
                     <MdDelete className="w-4 h-4" />
-                    Delete
+                    {t('banners.delete')}
                   </button>
                   <button
                     onClick={() => handleSave(banner.id)}
@@ -260,7 +257,7 @@ export default function BannersPage() {
                     className="flex items-center gap-1 px-4 py-2 bg-primary text-white text-sm rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <MdSave className="w-4 h-4" />
-                    {savingId === banner.id ? 'Saving...' : 'Save'}
+                    {savingId === banner.id ? t('banners.saving') : t('banners.save')}
                   </button>
                 </div>
               </div>

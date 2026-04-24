@@ -1,7 +1,8 @@
 'use client';
 
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import Image from 'next/image';
 import {
   MdEdit,
@@ -30,6 +31,7 @@ interface Company {
 }
 
 export default function CompanyListPage() {
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const confirm = useConfirm();
   const tableRef = useRef<DataTableHandle>(null);
@@ -37,19 +39,16 @@ export default function CompanyListPage() {
   const handleHardDelete = async (company: Company) => {
     if (company.insuranceCount > 0) {
       toast.error(
-        `Cannot delete: ${company.insuranceCount} linked insurance${
-          company.insuranceCount === 1 ? '' : 's'
-        }.`
+        t('companies.cannotDelete', { count: company.insuranceCount })
       );
       return;
     }
 
     const ok = await confirm({
-      title: `Delete "${company.name}" permanently?`,
-      description:
-        'This cannot be undone. The company, its metadata, and its logo file will be removed.',
+      title: t('companies.deleteConfirmTitle', { name: company.name }),
+      description: t('companies.deleteConfirmDescription'),
       variant: 'danger',
-      confirmLabel: 'Delete permanently',
+      confirmLabel: t('companies.deleteConfirmLabel'),
     });
     if (!ok) return;
 
@@ -59,26 +58,28 @@ export default function CompanyListPage() {
       });
       const result = await res.json();
       if (result.success) {
-        toast.success('Company deleted');
+        toast.success(t('companies.deleteSuccess'));
         tableRef.current?.reload();
       } else {
-        toast.error(`Failed: ${result.error}`);
+        toast.error(t('companies.deleteFailed', { error: result.error }));
       }
     } catch (error) {
       console.error('Error deleting company:', error);
-      toast.error('Error deleting company');
+      toast.error(t('companies.deleteError'));
     }
   };
 
   const handleToggleActive = async (company: Company) => {
     const nextState = !company.isActive;
     const ok = await confirm({
-      title: nextState ? 'Activate company?' : 'Archive company?',
+      title: nextState
+        ? t('companies.activateConfirmTitle')
+        : t('companies.archiveConfirmTitle'),
       description: nextState
-        ? 'Company will become visible on the public site.'
-        : 'Company will be hidden from the public site. You can restore it later.',
+        ? t('companies.activateDescription')
+        : t('companies.archiveDescription'),
       variant: nextState ? 'default' : 'danger',
-      confirmLabel: nextState ? 'Activate' : 'Archive',
+      confirmLabel: nextState ? t('companies.activate') : t('companies.archive'),
     });
     if (!ok) return;
 
@@ -90,100 +91,102 @@ export default function CompanyListPage() {
       });
       const result = await res.json();
       if (result.success) {
-        toast.success(nextState ? 'Activated' : 'Archived');
+        toast.success(
+          nextState ? t('companies.activated') : t('companies.archived')
+        );
         tableRef.current?.reload();
       } else {
-        toast.error(`Failed: ${result.error}`);
+        toast.error(t('companies.deleteFailed', { error: result.error }));
       }
     } catch (error) {
       console.error('Error toggling active:', error);
-      toast.error('Error updating status');
+      toast.error(t('companies.statusUpdateError'));
     }
   };
 
-  const columns: DataColumn<Company>[] = [
-    {
-      key: 'logo',
-      label: 'Logo',
-      render: (c) =>
-        c.logo ? (
-          <div className="relative w-12 h-12 bg-gray-50 border border-gray-200 rounded overflow-hidden">
-            <Image
-              src={c.logo}
-              alt={c.name}
-              fill
-              className="object-contain p-1"
-              sizes="48px"
-            />
-          </div>
-        ) : (
-          <div className="w-12 h-12 bg-gray-100 border border-dashed border-gray-300 rounded flex items-center justify-center text-xs text-gray-400">
-            —
-          </div>
+  const columns: DataColumn<Company>[] = useMemo(
+    () => [
+      {
+        key: 'logo',
+        label: t('companies.columns.logo'),
+        render: (c) =>
+          c.logo ? (
+            <div className="relative w-12 h-12 bg-gray-50 border border-gray-200 rounded overflow-hidden">
+              <Image
+                src={c.logo}
+                alt={c.name}
+                fill
+                className="object-contain p-1"
+                sizes="48px"
+              />
+            </div>
+          ) : (
+            <div className="w-12 h-12 bg-gray-100 border border-dashed border-gray-300 rounded flex items-center justify-center text-xs text-gray-400">
+              —
+            </div>
+          ),
+      },
+      { key: 'name', label: t('companies.columns.name') },
+      { key: 'slug', label: t('companies.columns.slug'), sortable: true },
+      { key: 'insuranceCount', label: t('companies.columns.insurances') },
+      {
+        key: 'isActive',
+        label: t('companies.columns.status'),
+        sortable: true,
+        render: (c) => (
+          <span
+            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+              c.isActive
+                ? 'bg-green-100 text-green-800'
+                : 'bg-gray-100 text-gray-600'
+            }`}
+          >
+            {c.isActive ? t('companies.active') : t('companies.archived')}
+          </span>
         ),
-    },
-    { key: 'name', label: 'Name' },
-    { key: 'slug', label: 'Slug', sortable: true },
-    { key: 'insuranceCount', label: 'Insurances' },
-    {
-      key: 'isActive',
-      label: 'Status',
-      sortable: true,
-      render: (c) => (
-        <span
-          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-            c.isActive
-              ? 'bg-green-100 text-green-800'
-              : 'bg-gray-100 text-gray-600'
-          }`}
-        >
-          {c.isActive ? 'Active' : 'Archived'}
-        </span>
-      ),
-    },
-    { key: 'updatedAt', label: 'Updated', sortable: true },
-  ];
+      },
+      { key: 'updatedAt', label: t('companies.columns.updated'), sortable: true },
+    ],
+    [t]
+  );
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Companies</h1>
-        <p className="text-gray-600 mt-1">
-          Manage insurance providers. Archived companies are hidden on the
-          public site.
-        </p>
+        <h1 className="text-3xl font-bold text-gray-900">{t('companies.title')}</h1>
+        <p className="text-gray-600 mt-1">{t('companies.subtitle')}</p>
       </div>
 
       <DataTable<Company>
         ref={tableRef}
         fetchUrl="/api/admin/companies"
-        staticParams={{ locale: 'en' }}
+        staticParams={{ locale: i18n.language }}
         keyColumn="id"
         columns={columns}
-        search={{ placeholder: 'Search by name or slug...' }}
+        search={{ placeholder: t('companies.searchPlaceholder') }}
         filters={[
           {
             key: 'isActive',
-            label: 'Status',
+            label: t('companies.columns.status'),
             defaultValue: '',
             options: [
-              { value: '', label: 'All Status' },
-              { value: 'true', label: 'Active' },
-              { value: 'false', label: 'Archived' },
+              { value: '', label: t('companies.filters.all') },
+              { value: 'true', label: t('companies.filters.active') },
+              { value: 'false', label: t('companies.filters.archived') },
             ],
           },
         ]}
         pagination={{ perPage: 20 }}
         defaultSort={{ key: 'slug', order: 'asc' }}
         onCreate={() => router.push('/admin/companies/create')}
-        createLabel="Create Company"
+        createLabel={t('companies.createLabel')}
         urlSync
         actions={(c) => (
           <>
             <button
               onClick={() => router.push(`/admin/companies/${c.id}`)}
               className="p-1.5 text-primary hover:bg-primary/10 rounded transition-colors"
-              title="Edit"
+              title={t('common.edit')}
             >
               <MdEdit className="w-4 h-4" />
             </button>
@@ -194,7 +197,7 @@ export default function CompanyListPage() {
                   ? 'text-red-600 hover:bg-red-50'
                   : 'text-green-600 hover:bg-green-50'
               }`}
-              title={c.isActive ? 'Archive' : 'Restore'}
+              title={c.isActive ? t('companies.archive') : t('companies.restore')}
             >
               {c.isActive ? (
                 <MdArchive className="w-4 h-4" />
@@ -206,7 +209,7 @@ export default function CompanyListPage() {
               <button
                 onClick={() => handleHardDelete(c)}
                 className="p-1.5 text-red-700 hover:bg-red-50 rounded transition-colors"
-                title="Delete permanently"
+                title={t('companies.deletePermanently')}
               >
                 <MdDeleteForever className="w-4 h-4" />
               </button>

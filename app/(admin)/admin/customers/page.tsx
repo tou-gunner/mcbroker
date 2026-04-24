@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import {
   MdAdd,
   MdEdit,
@@ -16,6 +17,7 @@ import {
 } from 'react-icons/md';
 import { toast } from 'sonner';
 import { useConfirm } from '../components/DialogProvider';
+import { formatDate } from '@/app/utils';
 
 interface Customer {
   id: string;
@@ -33,6 +35,7 @@ interface Customer {
 }
 
 export default function CustomerPage() {
+  const { t } = useTranslation();
   const router = useRouter();
   const confirm = useConfirm();
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -52,7 +55,7 @@ export default function CustomerPage() {
       // const response = await fetch('/api/admin/customers');
       // const data = await response.json();
       // setCustomers(data);
-      
+
       // Mock data for demonstration
       const mockCustomers: Customer[] = [
         {
@@ -94,7 +97,7 @@ export default function CustomerPage() {
           updatedAt: '2024-11-21T08:00:00Z'
         }
       ];
-      
+
       setCustomers(mockCustomers);
       setLoading(false);
     } catch (error) {
@@ -105,9 +108,9 @@ export default function CustomerPage() {
 
   const handleDelete = async (id: string) => {
     const ok = await confirm({
-      title: 'ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບລູກຄ້ານີ້?',
+      title: t('customers.deleteConfirm'),
       variant: 'danger',
-      confirmLabel: 'Delete',
+      confirmLabel: t('common.delete'),
     });
     if (!ok) return;
 
@@ -122,11 +125,11 @@ export default function CustomerPage() {
 
   const handleExport = () => {
     // TODO: Implement export functionality
-    toast.info('Export functionality coming soon');
+    toast.info(t('customers.exportComingSoon'));
   };
 
   const filteredCustomers = customers.filter(customer => {
-    const matchesSearch = 
+    const matchesSearch =
       customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       customer.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       customer.phone?.includes(searchTerm);
@@ -146,11 +149,11 @@ export default function CustomerPage() {
       INACTIVE: 'bg-gray-100 text-gray-800',
       PENDING: 'bg-yellow-100 text-yellow-800'
     };
-    
+
     const statusLabels = {
-      ACTIVE: 'ໃຊ້ງານ',
-      INACTIVE: 'ບໍ່ໃຊ້ງານ',
-      PENDING: 'ລໍຖ້າ'
+      ACTIVE: t('customers.status.active'),
+      INACTIVE: t('customers.status.inactive'),
+      PENDING: t('customers.status.pending')
     };
 
     return (
@@ -165,25 +168,25 @@ export default function CustomerPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">ຈັດການລູກຄ້າ</h1>
-          <p className="text-sm text-gray-600 mt-0.5">ຄຸ້ມຄອງຂໍ້ມູນລູກຄ້າ ແລະ ປະຫວັດການຊື້ປະກັນໄພ</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('customers.title')}</h1>
+          <p className="text-sm text-gray-600 mt-0.5">{t('customers.subtitle')}</p>
         </div>
-        
+
         <div className="flex items-center space-x-2">
           <button
             onClick={handleExport}
             className="flex items-center space-x-1.5 px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm"
           >
             <MdDownload className="w-4 h-4" />
-            <span>ສົ່ງອອກ</span>
+            <span>{t('customers.export')}</span>
           </button>
-          
+
           <button
             onClick={() => router.push('/admin/customer/create')}
             className="flex items-center space-x-1.5 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm shadow-sm"
           >
             <MdAdd className="w-4 h-4" />
-            <span>ເພີ່ມລູກຄ້າ</span>
+            <span>{t('customers.addCustomer')}</span>
           </button>
         </div>
       </div>
@@ -196,7 +199,7 @@ export default function CustomerPage() {
             <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
-              placeholder="ຄົ້ນຫາລູກຄ້າ..."
+              placeholder={t('customers.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
@@ -211,17 +214,17 @@ export default function CustomerPage() {
               onChange={(e) => setStatusFilter(e.target.value)}
               className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent appearance-none bg-white"
             >
-              <option value="ALL">ທຸກສະຖານະ</option>
-              <option value="ACTIVE">ໃຊ້ງານ</option>
-              <option value="INACTIVE">ບໍ່ໃຊ້ງານ</option>
-              <option value="PENDING">ລໍຖ້າ</option>
+              <option value="ALL">{t('customers.filters.all')}</option>
+              <option value="ACTIVE">{t('customers.filters.active')}</option>
+              <option value="INACTIVE">{t('customers.filters.inactive')}</option>
+              <option value="PENDING">{t('customers.filters.pending')}</option>
             </select>
           </div>
 
           {/* Results Count */}
           <div className="flex items-center justify-end">
             <span className="text-sm text-gray-600">
-              ສະແດງ <span className="font-semibold">{filteredCustomers.length}</span> ລູກຄ້າ
+              {t('customers.showing')} <span className="font-semibold">{filteredCustomers.length}</span> {t('customers.showingCustomers')}
             </span>
           </div>
         </div>
@@ -232,18 +235,18 @@ export default function CustomerPage() {
         {loading ? (
           <div className="p-12 text-center">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto"></div>
-            <p className="text-gray-600 mt-3 text-sm">ກຳລັງໂຫຼດຂໍ້ມູນ...</p>
+            <p className="text-gray-600 mt-3 text-sm">{t('customers.loading')}</p>
           </div>
         ) : currentCustomers.length === 0 ? (
           <div className="p-12 text-center">
             <div className="text-gray-400 mb-3">
               <MdPerson className="w-14 h-14 mx-auto" />
             </div>
-            <h3 className="text-base font-semibold text-gray-900 mb-1.5">ບໍ່ພົບລູກຄ້າ</h3>
+            <h3 className="text-base font-semibold text-gray-900 mb-1.5">{t('customers.empty')}</h3>
             <p className="text-sm text-gray-600 mb-4">
-              {searchTerm || statusFilter !== 'ALL' 
-                ? 'ລອງປັບການຄົ້ນຫາຂອງທ່ານ' 
-                : 'ເລີ່ມຕົ້ນໂດຍການເພີ່ມລູກຄ້າຄົນທຳອິດ'}
+              {searchTerm || statusFilter !== 'ALL'
+                ? t('customers.emptyAdjustSearch')
+                : t('customers.emptyStart')}
             </p>
             {!searchTerm && statusFilter === 'ALL' && (
               <button
@@ -251,7 +254,7 @@ export default function CustomerPage() {
                 className="inline-flex items-center space-x-1.5 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm"
               >
                 <MdAdd className="w-4 h-4" />
-                <span>ເພີ່ມລູກຄ້າ</span>
+                <span>{t('customers.addCustomer')}</span>
               </button>
             )}
           </div>
@@ -262,25 +265,25 @@ export default function CustomerPage() {
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
                     <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      ລູກຄ້າ
+                      {t('customers.columns.customer')}
                     </th>
                     <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      ຕິດຕໍ່
+                      {t('customers.columns.contact')}
                     </th>
                     <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      ທີ່ຢູ່
+                      {t('customers.columns.address')}
                     </th>
                     <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      ສະຖານະ
+                      {t('customers.columns.status')}
                     </th>
                     <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      ປະກັນ
+                      {t('customers.columns.policies')}
                     </th>
                     <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      ວັນທີສ້າງ
+                      {t('customers.columns.createdAt')}
                     </th>
                     <th className="px-4 py-2.5 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      ການປະຕິບັດ
+                      {t('customers.columns.actions')}
                     </th>
                   </tr>
                 </thead>
@@ -300,7 +303,7 @@ export default function CustomerPage() {
                             </div>
                             {customer.dateOfBirth && (
                               <div className="text-xs text-gray-500">
-                                {new Date(customer.dateOfBirth).toLocaleDateString('lo-LA')}
+                                {formatDate(customer.dateOfBirth)}
                               </div>
                             )}
                           </div>
@@ -338,31 +341,31 @@ export default function CustomerPage() {
                         <span className="text-sm font-medium text-gray-900">
                           {customer.totalPolicies}
                         </span>
-                        <span className="text-xs text-gray-500 ml-1">ກົດ</span>
+                        <span className="text-xs text-gray-500 ml-1">{t('customers.policies')}</span>
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-xs text-gray-500">
-                        {new Date(customer.createdAt).toLocaleDateString('lo-LA')}
+                        {formatDate(customer.createdAt)}
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex items-center justify-end space-x-1.5">
                           <button
                             onClick={() => router.push(`/admin/customer/${customer.id}`)}
                             className="p-1.5 text-primary hover:bg-primary/10 rounded transition-colors"
-                            title="ແກ້ໄຂ"
+                            title={t('customers.actions.edit')}
                           >
                             <MdEdit className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => router.push(`/admin/customer/${customer.id}/view`)}
                             className="p-1.5 text-green-600 hover:bg-green-50 rounded transition-colors"
-                            title="ເບິ່ງ"
+                            title={t('customers.actions.view')}
                           >
                             <MdVisibility className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleDelete(customer.id)}
                             className="p-1.5 text-secondary hover:bg-secondary/10 rounded transition-colors"
-                            title="ລຶບ"
+                            title={t('customers.actions.delete')}
                           >
                             <MdDelete className="w-4 h-4" />
                           </button>
@@ -378,7 +381,7 @@ export default function CustomerPage() {
             {totalPages > 1 && (
               <div className="px-4 py-3 bg-gray-50 border-t border-gray-200 flex items-center justify-between text-xs">
                 <div className="text-gray-600">
-                  ໜ້າ {currentPage} ຈາກ {totalPages} | ສະແດງ {startIndex + 1}-{Math.min(endIndex, filteredCustomers.length)} ຈາກ {filteredCustomers.length}
+                  {t('customers.pagination.pageOf', { current: currentPage, total: totalPages })} | {t('customers.pagination.showingRange', { start: startIndex + 1, end: Math.min(endIndex, filteredCustomers.length), total: filteredCustomers.length })}
                 </div>
                 <div className="flex items-center space-x-1.5">
                   <button
@@ -386,13 +389,13 @@ export default function CustomerPage() {
                     disabled={currentPage === 1}
                     className="px-3 py-1.5 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    ກ່ອນໜ້າ
+                    {t('customers.pagination.previous')}
                   </button>
-                  
+
                   {Array.from({ length: totalPages }, (_, i) => i + 1)
                     .filter(page => {
-                      return page === 1 || 
-                             page === totalPages || 
+                      return page === 1 ||
+                             page === totalPages ||
                              (page >= currentPage - 1 && page <= currentPage + 1);
                     })
                     .map((page, index, array) => (
@@ -412,13 +415,13 @@ export default function CustomerPage() {
                         </button>
                       </div>
                     ))}
-                  
+
                   <button
                     onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                     disabled={currentPage === totalPages}
                     className="px-3 py-1.5 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    ຖັດໄປ
+                    {t('customers.pagination.next')}
                   </button>
                 </div>
               </div>
@@ -429,4 +432,3 @@ export default function CustomerPage() {
     </div>
   );
 }
-
