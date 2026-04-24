@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/app/lib/prisma';
+import { deleteObjects, keyFromPublicUrl } from '@/app/lib/s3';
 
 // GET /api/admin/insurances/[id] - Get single insurance by ID
 export async function GET(
@@ -76,6 +77,7 @@ export async function GET(
       featured: insurance.featured,
       priority: insurance.priority,
       slug: insurance.slug,
+      thumbnail: insurance.thumbnail,
       category: {
         id: insurance.category.id,
         slug: insurance.category.slug,
@@ -125,6 +127,7 @@ export async function PUT(
       featured,
       priority,
       slug,
+      thumbnail, // string URL, or null to clear
       metadata, // Array of { locale, name, description }
       content,  // Array of { locale, contentJson, contentHtml, contentText, images }
       tags,     // Array of tag IDs
@@ -148,6 +151,24 @@ export async function PUT(
       }, { status: 404 });
     }
 
+    // If the caller is clearing/replacing the thumbnail, delete the old S3 object.
+    // null/undefined-thumbnail in the body means "leave it alone"; explicit null means "clear it".
+    const thumbnailProvided = Object.prototype.hasOwnProperty.call(body, 'thumbnail');
+    if (
+      thumbnailProvided &&
+      existingInsurance.thumbnail &&
+      existingInsurance.thumbnail !== thumbnail
+    ) {
+      const oldKey = keyFromPublicUrl(existingInsurance.thumbnail);
+      if (oldKey && oldKey.startsWith('insurances/')) {
+        try {
+          await deleteObjects([oldKey]);
+        } catch (e) {
+          console.warn('failed to delete old thumbnail object', oldKey, e);
+        }
+      }
+    }
+
     // Update insurance
     const insurance = await prisma.insurance.update({
       where: { id },
@@ -158,6 +179,7 @@ export async function PUT(
         ...(typeof featured !== 'undefined' && { featured }),
         ...(typeof priority !== 'undefined' && { priority }),
         ...(slug && { slug }),
+        ...(thumbnailProvided && { thumbnail }),
         ...(updatedBy && { updatedBy })
       }
     });
@@ -287,6 +309,18 @@ export async function DELETE(
         success: false,
         error: 'Insurance not found'
       }, { status: 404 });
+    }
+
+    // Best-effort clean up the thumbnail S3 object before the row is gone.
+    if (insurance.thumbnail) {
+      const key = keyFromPublicUrl(insurance.thumbnail);
+      if (key && key.startsWith('insurances/')) {
+        try {
+          await deleteObjects([key]);
+        } catch (e) {
+          console.warn('failed to delete thumbnail object', key, e);
+        }
+      }
     }
 
     // Delete insurance (cascade will handle related records)

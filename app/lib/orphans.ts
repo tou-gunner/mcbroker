@@ -32,12 +32,13 @@ export async function collectReferencedKeys(): Promise<Set<string>> {
     if (key) referenced.add(key);
   };
 
-  const [contents, companies, settings] = await Promise.all([
+  const [contents, companies, settings, insurances] = await Promise.all([
     prisma.insuranceContent.findMany({
       select: { contentJson: true, contentHtml: true, images: true },
     }),
     prisma.company.findMany({ select: { logo: true } }),
     prisma.setting.findMany({ select: { value: true } }),
+    prisma.insurance.findMany({ select: { thumbnail: true } }),
   ]);
 
   for (const c of contents) {
@@ -47,6 +48,7 @@ export async function collectReferencedKeys(): Promise<Set<string>> {
   }
   for (const co of companies) record(co.logo);
   for (const s of settings) record(s.value);
+  for (const ins of insurances) record(ins.thumbnail);
 
   return referenced;
 }

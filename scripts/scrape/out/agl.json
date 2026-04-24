@@ -1,0 +1,138 @@
+{
+  "company": {
+    "slug": "allianz",
+    "source_url": "https://www.agl.com.la/",
+    "name_en": "Allianz Insurance Laos (AGL)",
+    "description_en": "Assurances Générales du Laos (AGL), operating under the Allianz brand, is one of the longest-established insurers in Lao PDR. AGL offers a full catalog of motor, health, life, travel, home, and commercial insurance products, backed by a nationwide network of garages and hospitals across Laos and Thailand."
+  },
+  "products": [
+    {
+      "page_id": 694,
+      "source_url": "https://www.agl.com.la/?page_id=694",
+      "category_slug": "car",
+      "name_en": "Smart Flex Motor Insurance",
+      "description_en": "Driving with a peaceful mind on every journey with Assurances General Laos All Risk Motor Insurance: SMART FLEX that helps to protect your vehicle against various risks.",
+      "thumbnail_url": "https://www.agl.com.la/wp-content/uploads/2025/07/motor.png"
+    },
+    {
+      "page_id": 696,
+      "source_url": "https://www.agl.com.la/?page_id=696",
+      "category_slug": "car",
+      "name_en": "Worry Free Driving Motor Insurance",
+      "description_en": "WYFI, let you enjoy the pleasure of driving without worrying on any damages or expenses occurred from car accident as your car will be covered by WYFI.",
+      "thumbnail_url": "https://www.agl.com.la/wp-content/uploads/2025/06/Capture.jpg"
+    },
+    {
+      "page_id": 698,
+      "source_url": "https://www.agl.com.la/?page_id=698",
+      "category_slug": "car",
+      "name_en": "Third Party Liability Motor Insurance",
+      "description_en": "By legal binding, all vehicles circulating in Lao PDR must have insurance to cover their victims in case of road accidents. Whether you are the owner/driver of a vehicle such as tuk-tuk, a motorbike, a car, a pick-up or a truck with a very experienced and cautious drive, you may be involved in a traffic accident and there may be victims of bodily injuries or loss of life",
+      "thumbnail_url": "https://www.agl.com.la/wp-content/uploads/2025/06/TPL.jpg"
+    },
+    {
+      "page_id": 700,
+      "source_url": "https://www.agl.com.la/?page_id=700",
+      "category_slug": "health",
+      "name_en": "Health Insurance",
+      "description_en": "Assurances General Laos Health Insurance provides you with sufficient cover for minor health problems up to serious illness, and including hospitalization and doctor visit.",
+      "thumbnail_url": "https://www.agl.com.la/wp-content/uploads/2025/04/gettyimages-517416212.jpeg"
+    },
+    {
+      "page_id": 702,
+      "source_url": "https://www.agl.com.la/?page_id=702",
+      "category_slug": "accident",
+      "name_en": "Personal Accident",
+      "description_en": "Personal Accident Insurance provides you the best coverage for medical expenses, permanent disability, and death, protecting you and your family from any unexpected expense caused by accidents.",
+      "thumbnail_url": "https://www.agl.com.la/wp-content/uploads/2025/04/adobestock-257389398.jpeg"
+    },
+    {
+      "page_id": 704,
+      "source_url": "https://www.agl.com.la/?page_id=704",
+      "category_slug": "business",
+      "name_en": "Workmen’s Compensation Insurance",
+      "description_en": "Legislation states that an employer is liable for any losses or injuries to the employee arising from bodily injury, which caused by an accident in the course of his employment and whereas the employee carrying on the business.",
+      "thumbnail_url": "https://www.agl.com.la/wp-content/uploads/2026/04/AGL-3565-1536x1024.jpg"
+    },
+    {
+      "page_id": 706,
+      "source_url": "https://www.agl.com.la/?page_id=706",
+      "category_slug": "life",
+      "name_en": "Life Protection Insurance",
+      "description_en": "Assurances General Laos Life Protection Insurance helps to create a stable security for your love family in case of unexpected incident happen to you in the future.",
+      "thumbnail_url": "https://www.agl.com.la/wp-content/uploads/2025/07/life-2048x1010.jpg"
+    },
+    {
+      "page_id": 708,
+      "source_url": "https://www.agl.com.la/?page_id=708",
+      "category_slug": "life",
+      "name_en": "Term Life Insurance",
+      "description_en": "Term Life Insurance provides life coverage to you and your family in case of death.",
+      "thumbnail_url": "https://www.agl.com.la/wp-content/uploads/2025/04/gettyimages-580504563-super.jpeg"
+    },
+    {
+      "page_id": 710,
+      "source_url": "https://www.agl.com.la/?page_id=710",
+      "category_slug": "travel",
+      "name_en": "Travel Insurance",
+      "description_en": "Travel Insurance covers you from accident or disease that may happen during your travel to abroad and cover for accident when you travel within Laos. Whether you travel for leisure or business, alone or in a group, for a short duration or several months, Assurances General Laos provides solutions adapted to your situation and your needs.",
+      "thumbnail_url": "https://www.agl.com.la/wp-content/uploads/elementor/thumbs/AGL-2665-rmbalhz40gl75ddpfexm0iv31oe85642cd28u7szmg.jpg"
+    },
+    {
+      "page_id": 712,
+      "source_url": "https://www.agl.com.la/?page_id=712",
+      "category_slug": "home",
+      "name_en": "Home Insurance",
+      "description_en": "If damages occur to your property, you will be reimbursed up to the limits you chosed for your policy cover.",
+      "thumbnail_url": "https://www.agl.com.la/wp-content/uploads/2025/03/image-6-2048x1042.png"
+    },
+    {
+      "page_id": 714,
+      "source_url": "https://www.agl.com.la/?page_id=714",
+      "category_slug": "business",
+      "name_en": "Small Commercial Business Insurance",
+      "description_en": "Our Small Commercial Business Insurance protects your business (building, contents, business equipment and stock) from fire and other disasters.",
+      "thumbnail_url": "https://www.agl.com.la/wp-content/uploads/elementor/thumbs/AGL-522-rmbd9y6xagmegxa483tgv6ntf103z30ixqxvmcsp5k.jpg"
+    },
+    {
+      "page_id": 716,
+      "source_url": "https://www.agl.com.la/?page_id=716",
+      "category_slug": "business",
+      "name_en": "Property “All Risks”",
+      "description_en": "This insurance is applicable for all industrial and commercial businesses to cover all risks of loss or damage to property.",
+      "thumbnail_url": "https://www.agl.com.la/wp-content/uploads/2025/04/sean-pollock-203658-unsplash.jpeg"
+    },
+    {
+      "page_id": 718,
+      "source_url": "https://www.agl.com.la/?page_id=718",
+      "category_slug": "business",
+      "name_en": "Public Liability Insurance",
+      "description_en": "Public Liability insurance is considered essential in businesses which involve regular interactions between the members of the public and the company such as retail businesses, restaurants, clinics and many more",
+      "thumbnail_url": "https://www.agl.com.la/wp-content/uploads/2025/06/attention-maintenance-danger-risk-swimming-2048x1365.jpg"
+    },
+    {
+      "page_id": 720,
+      "source_url": "https://www.agl.com.la/?page_id=720",
+      "category_slug": "business",
+      "name_en": "Engineering & Machinery Insurance",
+      "description_en": "Contractors' All Risks Insurance cater mainly to the protection needs of the construction industry. This policy is designed to provide protection against losses or damages in respect of the contract works at contract site and third (3rd) party claims arising in connection with the construction of a project. With additional premium, the cover may include Construction Plant and Equipment, Construction Machinery, Removal of Debris, Professional Fees and Principal’s Existing Property. Duration of cover corresponds with the contract period which is stipulated in the Letter of Award.",
+      "thumbnail_url": "https://www.agl.com.la/wp-content/uploads/2025/06/Construction.jpg"
+    },
+    {
+      "page_id": 722,
+      "source_url": "https://www.agl.com.la/?page_id=722",
+      "category_slug": "business",
+      "name_en": "Money Insurance",
+      "description_en": "Whether you are on your way to the bank to deposit your business earnings for the day or you prefer to keep the cash at your business premise, having Money Insurance could save you from unexpected financial loss in the event of robbery or theft.",
+      "thumbnail_url": "https://www.agl.com.la/wp-content/uploads/2025/06/24308-scaled.jpg"
+    },
+    {
+      "page_id": 724,
+      "source_url": "https://www.agl.com.la/?page_id=724",
+      "category_slug": "business",
+      "name_en": "Transport Insurance",
+      "description_en": "Marine Cargo insurance provides coverage with options of protection against all risks or loss from accident only during the transportation of goods and merchandise – anywhere from the time your goods leave the premises of the seller until the time they arrive at the buyer’s premises",
+      "thumbnail_url": "https://www.agl.com.la/wp-content/uploads/2025/06/aerial-view-cargo-ship-cargo-container-harbor-2048x1365.jpg"
+    }
+  ]
+}

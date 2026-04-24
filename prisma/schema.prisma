@@ -110,7 +110,10 @@ model Insurance {
   
   // Optional: SEO
   slug       String?             @unique
-  
+
+  // Optional: public card thumbnail (S3 URL); falls back to category icon when null
+  thumbnail  String?
+
   createdAt  DateTime            @default(now()) @map("created_at")
   updatedAt  DateTime            @updatedAt @map("updated_at")
   

@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { MdSave, MdArrowBack, MdPublish, MdDrafts, MdPreview, MdAdd } from 'react-icons/md';
+import Image from 'next/image';
+import { MdSave, MdArrowBack, MdPublish, MdDrafts, MdPreview, MdAdd, MdDelete } from 'react-icons/md';
 import { toast } from 'sonner';
+import ImageUpload from '../../components/ImageUpload';
 
 // Import editor dynamically to avoid SSR issues
 const RichTextEditor = dynamic(() => import('../../components/RichTextEditor'), {
@@ -23,6 +25,7 @@ interface InsuranceForm {
   featured: boolean;
   priority: number;
   slug: string;
+  thumbnail: string | null;
   metadata: {
     locale: string;
     name: string;
@@ -62,6 +65,7 @@ export default function InsuranceEditorPage() {
     featured: false,
     priority: 0,
     slug: '',
+    thumbnail: null,
     metadata: [
       { locale: 'en', name: '', description: '' },
       { locale: 'lo', name: '', description: '' },
@@ -119,6 +123,7 @@ export default function InsuranceEditorPage() {
           featured: insurance.featured || false,
           priority: insurance.priority || 0,
           slug: insurance.slug || '',
+          thumbnail: insurance.thumbnail ?? null,
           metadata: [
             {
               locale: 'en',
@@ -191,6 +196,47 @@ export default function InsuranceEditorPage() {
       toast.error('Failed to save insurance. Please try again.');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleThumbnailUploaded = async (url: string) => {
+    try {
+      const res = await fetch(`/api/admin/insurances/${insuranceId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ thumbnail: url }),
+      });
+      const result = await res.json();
+      if (result.success) {
+        setFormData(prev => ({ ...prev, thumbnail: url }));
+        toast.success('Thumbnail uploaded');
+      } else {
+        toast.error('Thumbnail upload succeeded but DB update failed');
+      }
+    } catch (error) {
+      console.error('Error attaching thumbnail:', error);
+      toast.error('Error attaching thumbnail');
+    }
+  };
+
+  const handleThumbnailDelete = async () => {
+    if (!window.confirm('Remove the thumbnail? The file will be deleted from storage.')) return;
+    try {
+      const res = await fetch(`/api/admin/insurances/${insuranceId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ thumbnail: null }),
+      });
+      const result = await res.json();
+      if (result.success) {
+        setFormData(prev => ({ ...prev, thumbnail: null }));
+        toast.success('Thumbnail removed');
+      } else {
+        toast.error('Failed to remove thumbnail');
+      }
+    } catch (error) {
+      console.error('Error removing thumbnail:', error);
+      toast.error('Error removing thumbnail');
     }
   };
 
@@ -527,6 +573,59 @@ export default function InsuranceEditorPage() {
           </div>
         </div>
       </div>
+
+      {/* Thumbnail section — shown only in edit mode (upload key requires insuranceId) */}
+      {currentLocale === 'en' && (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">Thumbnail</h2>
+          {!isEdit ? (
+            <p className="text-sm text-gray-500">
+              Save the insurance first, then upload a thumbnail.
+            </p>
+          ) : formData.thumbnail ? (
+            <div className="flex items-start gap-6">
+              <div className="relative w-80 h-50 bg-gray-50 border border-gray-200 rounded-lg overflow-hidden" style={{ height: '200px' }}>
+                <Image
+                  src={formData.thumbnail}
+                  alt="Insurance thumbnail"
+                  fill
+                  className="object-cover"
+                  sizes="320px"
+                />
+              </div>
+              <div className="flex flex-col gap-3">
+                <ImageUpload
+                  scope="insurance-thumbnail"
+                  entityId={insuranceId}
+                  onUploaded={(url) => handleThumbnailUploaded(url)}
+                />
+                <button
+                  type="button"
+                  onClick={handleThumbnailDelete}
+                  className="inline-flex items-center gap-1 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded border border-red-200 w-max"
+                >
+                  <MdDelete className="w-4 h-4" />
+                  Remove thumbnail
+                </button>
+                <p className="text-xs text-gray-500">
+                  Uploading replaces the current thumbnail. Renders on the public company page.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <ImageUpload
+                scope="insurance-thumbnail"
+                entityId={insuranceId}
+                onUploaded={(url) => handleThumbnailUploaded(url)}
+              />
+              <p className="text-xs text-gray-500">
+                Landscape image recommended (~320×200 rendered), ≤10MB. Falls back to the category icon when empty.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Rich Content Editor */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">

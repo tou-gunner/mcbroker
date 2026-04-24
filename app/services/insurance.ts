@@ -33,6 +33,7 @@ export const getInsurancesByCompanyId = async (
         description: pickMetadata(insurance.metadata, locale, 'description'),
         category: insurance.category.slug,
         companyId: insurance.companyId,
+        thumbnail: insurance.thumbnail ?? undefined,
         createdAt: insurance.createdAt,
         updatedAt: insurance.updatedAt,
     }));

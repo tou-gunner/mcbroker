@@ -44,13 +44,26 @@ When reading/writing an entity, **always scope `metadata`/`content` includes wit
 
 When creating an insurance, metadata rows are emitted in two passes — once per `(locale, key='name')` and once per `(locale, key='description')` — see [route.ts:167-178](app/api/admin/insurances/route.ts#L167-L178).
 
+**Soft-delete on Company** ([prisma/schema.prisma](prisma/schema.prisma)): `Company.isActive` defaults to `true`. **Public services must filter `where: { isActive: true }`** ([app/services/company.ts](app/services/company.ts)) — archived companies stay in the DB but disappear from the public site. Admin queries ignore the flag. Hard-delete is allowed only when `insurances.count === 0`; otherwise the DELETE endpoint returns 409 (`Insurance.companyId` has `onDelete: Restrict`).
+
+**Audit fields**: both `Insurance` and `Company` carry nullable `createdBy` / `updatedBy` — `Admin.id` strings, not FK relations. Handlers set them from [`getSessionAdmin()`](app/lib/session.ts). Rows that predate the column (e.g., the 22 companies seeded from `scripts/migrate-companies-to-db.ts`) have `null` there.
+
 ### API layout
 - Public reads: [app/api/companies/](app/api/companies/), [app/api/insurances/](app/api/insurances/), [app/api/settings/](app/api/settings/).
 - Admin writes: [app/api/admin/](app/api/admin/) — `insurances`, `companies`, `categories`, `tags`, `settings`.
 - All routes import `prisma` from [app/lib/prisma.ts](app/lib/prisma.ts), which is a global singleton wrapping `new PrismaClient({ adapter: new PrismaPg(...) })`.
 
-### Services vs DB (known inconsistency)
-[app/services/company.ts](app/services/company.ts) currently returns **hardcoded sample data** — it does *not* hit Prisma. The public pages under `app/(public)/[locale]/` (e.g. `CompanyListSection`) consume these services. The admin CMS and `/api/admin/*` routes hit Prisma. Before changing service signatures or sample data, verify which callers read from which.
+### Services layer (Prisma-backed)
+The public site reads through a thin services layer in [app/services/](app/services/) — **not** directly from Prisma. Both files are now DB-backed; the old hardcoded sample arrays are gone.
+
+- [app/services/company.ts](app/services/company.ts): `getCompanyList(locale)` and `getCompany(id, locale)` query Prisma with `isActive: true`, resolve localized `name`/`description` from `CompanyMetadata` (falls back to `en`), and derive `available_insurances` from distinct `category.slug` values of that company's **PUBLISHED** insurances. `getCompany` returns `undefined` for archived rows so `/<locale>/company/<id>` renders "not found".
+- [app/services/insurance.ts](app/services/insurance.ts): `getInsurancesByCompanyId(companyId, locale)` filters `status: 'PUBLISHED'`, orders by `featured`/`priority`/`createdAt`, and maps `InsuranceCategory.slug` into `InsuranceResponse.category` (which feeds [`getInsuranceLogo`](app/utils/index.ts)).
+
+Callers must pass `locale`: public pages get it from `params.locale`, `AppContext.fetchCompanies` gets it from `useLocale()`, and the public API routes ([app/api/companies/](app/api/companies/), [app/api/insurances/](app/api/insurances/)) read `?locale=` (default `en`).
+
+### Seed / backfill scripts
+- [scripts/migrate-companies-to-db.ts](scripts/migrate-companies-to-db.ts) — idempotent `upsert` by `slug` for the 21 original companies with en/lo metadata. Already run; safe to re-run.
+- [scripts/migrate-company-logos-to-slug.ts](scripts/migrate-company-logos-to-slug.ts) — one-off: copies each company's logo from the legacy numeric path (`companies/<numeric>/logo.<ext>`) to the slug path (`companies/<slug>/logo.<ext>`), updates `company.logo`, deletes the old object. Idempotent (skips already-correct paths); supports `--dry-run`. Already run for the initial 21 rows.
 
 ## Storage (MinIO S3 at `https://s3.mcins.la/mcins`)
 
@@ -66,7 +79,7 @@ User-uploaded images live in a MinIO bucket. Uploads go through a **server-proxy
 |---|---|
 | `insurance-content` | `insurances/content/<uuid>.<ext>` — **not** per-insurance (see compromise below) |
 | `insurance-image` | `insurances/<insuranceId>/<uuid>.<ext>` |
-| `company-logo` | `companies/<companyId>/logo.<ext>` — overwrites on re-upload |
+| `company-logo` | `companies/<slug>/logo.<ext>` — upload endpoint resolves slug by `entityId` (company UUID); overwrites on re-upload. Renaming a slug via PUT `/api/admin/companies/[id]` auto-renames the S3 object (copy → update DB → delete old; rolls back the copy if the DB update fails). |
 | `banner` | `banners/<uuid>.<ext>` |
 | `setting` | `settings/<entityKey>.<ext>` |
 

@@ -4,6 +4,7 @@ export interface InsuranceResponse {
     category: string;
     description: string;
     companyId: string;
+    thumbnail?: string;
     contentHtml?: string;
     contentJson?: any;
     contentText?: string;

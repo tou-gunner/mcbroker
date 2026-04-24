@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/app/lib/prisma';
 import { getSessionAdmin } from '@/app/lib/session';
-import { deleteObjects, keyFromPublicUrl } from '@/app/lib/s3';
+import { copyObject, deleteObjects, keyFromPublicUrl, publicUrl } from '@/app/lib/s3';
 
 // GET /api/admin/companies/[id] - Get single company with all-locale metadata
 export async function GET(
@@ -87,16 +87,51 @@ export async function PUT(
       );
     }
 
+    // Slug change: if the company has a logo under companies/<old-slug>/,
+    // rename it to companies/<new-slug>/ so the key stays aligned with the
+    // slug. Callers can still override `logo` explicitly; their value wins.
+    let effectiveLogo: string | null | undefined = logo;
+    let renamedLogoKey: { from: string; to: string } | null = null;
+    const slugChanging = slug !== undefined && slug !== existing.slug;
+
+    if (slugChanging && existing.logo && logo === undefined) {
+      const oldKey = keyFromPublicUrl(existing.logo);
+      if (oldKey && oldKey.startsWith('companies/')) {
+        const ext = oldKey.split('.').pop() ?? 'jpg';
+        const newKey = `companies/${slug}/logo.${ext}`;
+        if (oldKey !== newKey) {
+          try {
+            await copyObject(oldKey, newKey);
+            effectiveLogo = publicUrl(newKey);
+            renamedLogoKey = { from: oldKey, to: newKey };
+          } catch (err) {
+            console.error('Failed to copy logo during slug rename:', err);
+            return NextResponse.json(
+              { success: false, error: 'Failed to rename logo during slug change' },
+              { status: 500 }
+            );
+          }
+        }
+      }
+    }
+
     try {
       await prisma.company.update({
         where: { id },
         data: {
           ...(slug !== undefined && { slug }),
-          ...(logo !== undefined && { logo }),
+          ...(effectiveLogo !== undefined && { logo: effectiveLogo }),
           updatedBy: admin?.id ?? existing.updatedBy,
         },
       });
     } catch (err: any) {
+      // DB update failed: if we already copied the logo, clean up the copy
+      // so we don't leak an orphan at the new path.
+      if (renamedLogoKey) {
+        await deleteObjects([renamedLogoKey.to]).catch((e) =>
+          console.error('Failed to clean up copied logo after DB error:', e)
+        );
+      }
       if (err?.code === 'P2002') {
         return NextResponse.json(
           { success: false, error: 'Slug already in use' },
@@ -104,6 +139,13 @@ export async function PUT(
         );
       }
       throw err;
+    }
+
+    // Best-effort cleanup of the old logo object after a successful rename.
+    if (renamedLogoKey) {
+      await deleteObjects([renamedLogoKey.from]).catch((e) =>
+        console.error('Failed to delete old logo after rename:', e)
+      );
     }
 
     if (metadata && Array.isArray(metadata)) {

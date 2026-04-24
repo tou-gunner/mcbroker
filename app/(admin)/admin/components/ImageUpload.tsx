@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react';
 import { MdCloudUpload } from 'react-icons/md';
 
-type Scope = 'insurance-content' | 'insurance-image' | 'company-logo' | 'banner' | 'setting';
+type Scope = 'insurance-content' | 'insurance-image' | 'insurance-thumbnail' | 'company-logo' | 'banner' | 'setting';
 
 interface ImageUploadProps {
   scope: Scope;

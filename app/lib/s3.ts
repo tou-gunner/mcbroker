@@ -2,6 +2,7 @@ import {
   S3Client,
   ListObjectsV2Command,
   DeleteObjectsCommand,
+  CopyObjectCommand,
 } from "@aws-sdk/client-s3";
 
 const globalForS3 = globalThis as unknown as { s3?: S3Client };
@@ -67,6 +68,16 @@ export async function listObjects(prefix: string): Promise<S3Object[]> {
     continuationToken = res.IsTruncated ? res.NextContinuationToken : undefined;
   } while (continuationToken);
   return results;
+}
+
+export async function copyObject(fromKey: string, toKey: string): Promise<void> {
+  await s3.send(
+    new CopyObjectCommand({
+      Bucket: S3_BUCKET,
+      CopySource: `${S3_BUCKET}/${fromKey}`,
+      Key: toKey,
+    }),
+  );
 }
 
 export async function deleteObjects(keys: string[]): Promise<number> {
