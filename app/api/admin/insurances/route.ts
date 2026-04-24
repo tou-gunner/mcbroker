@@ -1,6 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/app/lib/prisma';
 
+const INSURANCE_SORT_KEYS = [
+  'slug',
+  'status',
+  'featured',
+  'priority',
+  'createdAt',
+  'updatedAt',
+] as const;
+type InsuranceSortKey = (typeof INSURANCE_SORT_KEYS)[number];
+
 // GET /api/admin/insurances - Get all insurances with optional filters
 export async function GET(request: NextRequest) {
   try {
@@ -8,108 +18,120 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status');
     const categoryId = searchParams.get('categoryId');
     const companyId = searchParams.get('companyId');
-    const search = searchParams.get('search');
+    const q = (searchParams.get('q') ?? searchParams.get('search'))?.trim() || '';
     const locale = searchParams.get('locale') || 'en';
+    const sortParam = searchParams.get('sort');
+    const orderParam = searchParams.get('order');
+    const pageParam = searchParams.get('page');
+    const perPageParam = searchParams.get('perPage');
 
     // Build where clause
     const where: any = {};
-    
+
     if (status && status !== 'ALL') {
       where.status = status;
     }
-    
+
     if (categoryId) {
       where.categoryId = categoryId;
     }
-    
+
     if (companyId) {
       where.companyId = companyId;
     }
 
-    // Fetch insurances with relations
-    const insurances = await prisma.insurance.findMany({
-      where,
-      include: {
-        category: {
-          include: {
-            metadata: {
-              where: { locale, key: 'name' }
-            }
-          }
+    if (q) {
+      where.OR = [
+        { slug: { contains: q, mode: 'insensitive' } },
+        {
+          metadata: {
+            some: {
+              locale,
+              key: { in: ['name', 'description'] },
+              value: { contains: q, mode: 'insensitive' },
+            },
+          },
         },
-        company: {
-          include: {
-            metadata: {
-              where: { locale, key: 'name' }
-            }
-          }
-        },
-        metadata: {
-          where: { locale }
-        },
-        content: {
-          where: { locale }
-        },
-        tags: {
-          include: {
-            tag: true
-          }
-        }
-      },
-      orderBy: [
-        { featured: 'desc' },
-        { priority: 'desc' },
-        { createdAt: 'desc' }
-      ]
-    });
-
-    // Filter by search term if provided
-    let filteredInsurances = insurances;
-    if (search) {
-      const searchLower = search.toLowerCase();
-      filteredInsurances = insurances.filter(insurance => {
-        const name = insurance.metadata.find(m => m.key === 'name')?.value || '';
-        const description = insurance.metadata.find(m => m.key === 'description')?.value || '';
-        return (
-          name.toLowerCase().includes(searchLower) ||
-          description.toLowerCase().includes(searchLower) ||
-          insurance.slug?.toLowerCase().includes(searchLower)
-        );
-      });
+      ];
     }
 
+    const sort = (INSURANCE_SORT_KEYS as readonly string[]).includes(sortParam ?? '')
+      ? (sortParam as InsuranceSortKey)
+      : null;
+    const order = orderParam === 'desc' ? 'desc' : 'asc';
+    const orderBy: any = sort
+      ? [{ [sort]: order }]
+      : [
+          { featured: 'desc' },
+          { priority: 'desc' },
+          { createdAt: 'desc' },
+        ];
+
+    const paginated = pageParam !== null || perPageParam !== null;
+    const page = Math.max(1, Number(pageParam) || 1);
+    const perPage = Math.max(1, Math.min(200, Number(perPageParam) || 20));
+
+    const [insurances, total] = await Promise.all([
+      prisma.insurance.findMany({
+        where,
+        include: {
+          category: {
+            include: {
+              metadata: { where: { locale, key: 'name' } },
+            },
+          },
+          company: {
+            include: {
+              metadata: { where: { locale, key: 'name' } },
+            },
+          },
+          metadata: { where: { locale } },
+          content: { where: { locale } },
+          tags: { include: { tag: true } },
+        },
+        orderBy,
+        ...(paginated
+          ? { skip: (page - 1) * perPage, take: perPage }
+          : {}),
+      }),
+      prisma.insurance.count({ where }),
+    ]);
+
     // Format response
-    const formattedInsurances = filteredInsurances.map(insurance => ({
+    const formattedInsurances = insurances.map((insurance) => ({
       id: insurance.id,
       slug: insurance.slug,
       status: insurance.status,
       featured: insurance.featured,
       priority: insurance.priority,
-      name: insurance.metadata.find(m => m.key === 'name')?.value || '',
-      description: insurance.metadata.find(m => m.key === 'description')?.value || '',
+      name: insurance.metadata.find((m) => m.key === 'name')?.value || '',
+      description:
+        insurance.metadata.find((m) => m.key === 'description')?.value || '',
       category: {
         id: insurance.category.id,
         slug: insurance.category.slug,
-        name: insurance.category.metadata[0]?.value || insurance.category.slug
+        name:
+          insurance.category.metadata[0]?.value || insurance.category.slug,
       },
       company: {
         id: insurance.company.id,
         slug: insurance.company.slug,
         logo: insurance.company.logo,
-        name: insurance.company.metadata[0]?.value || insurance.company.slug
+        name: insurance.company.metadata[0]?.value || insurance.company.slug,
       },
       content: insurance.content[0] || null,
-      tags: insurance.tags.map(t => t.tag),
+      tags: insurance.tags.map((t) => t.tag),
       createdAt: insurance.createdAt,
       updatedAt: insurance.updatedAt,
       createdBy: insurance.createdBy,
-      updatedBy: insurance.updatedBy
+      updatedBy: insurance.updatedBy,
     }));
 
     return NextResponse.json({
       success: true,
       data: formattedInsurances,
-      count: formattedInsurances.length
+      total,
+      count: formattedInsurances.length,
     });
   } catch (error) {
     console.error('Error fetching insurances:', error);

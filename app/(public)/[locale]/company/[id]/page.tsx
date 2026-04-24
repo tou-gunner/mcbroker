@@ -1,5 +1,6 @@
 import { getCompany, getInsurancesByCompanyId } from "@/app/services";
 import { getInsuranceLogo } from "@/app/utils";
+import { Link } from "@/i18n/routing";
 import Image from "next/image";
 
 export default async function CompanyPage({ params }: { params: Promise<{ id: string; locale: string }> }) {
@@ -24,7 +25,7 @@ export default async function CompanyPage({ params }: { params: Promise<{ id: st
         {insurances.map((insurance) => {
             const IconComponent = getInsuranceLogo(insurance.category);
             return (
-            <div key={insurance.id} className="cursor-pointer hover:scale-105 transition-all duration-300 flex flex-col items-center justify-between bg-white rounded w-80 h-50 overflow-hidden">
+            <Link key={insurance.id} href={`/insurance/${insurance.id}`} className="cursor-pointer hover:scale-105 transition-all duration-300 flex flex-col items-center justify-between bg-white rounded w-80 h-50 overflow-hidden">
                 <div className="relative grow flex items-center justify-center w-full bg-[#f8f2ea] rounded-t overflow-hidden">
                 {insurance.thumbnail ? (
                   <Image
@@ -39,7 +40,7 @@ export default async function CompanyPage({ params }: { params: Promise<{ id: st
                 )}
                 </div>
                 <h4 className="text-secondary text-2xl font-bold p-6">{insurance.name}</h4>
-            </div>
+            </Link>
             );
         })}
         </div>

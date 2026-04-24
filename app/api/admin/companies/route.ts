@@ -2,44 +2,80 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/app/lib/prisma';
 import { getSessionAdmin } from '@/app/lib/session';
 
+const COMPANY_SORT_KEYS = ['slug', 'isActive', 'createdAt', 'updatedAt'] as const;
+type CompanySortKey = (typeof COMPANY_SORT_KEYS)[number];
+
 // GET /api/admin/companies - Get all insurance companies
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
     const locale = searchParams.get('locale') || 'en';
+    const q = searchParams.get('q')?.trim() || '';
+    const isActiveParam = searchParams.get('isActive');
+    const sortParam = searchParams.get('sort');
+    const orderParam = searchParams.get('order');
+    const pageParam = searchParams.get('page');
+    const perPageParam = searchParams.get('perPage');
 
-    const companies = await prisma.company.findMany({
-      include: {
-        metadata: {
-          where: { locale }
+    const where: any = {};
+    if (isActiveParam === 'true') where.isActive = true;
+    else if (isActiveParam === 'false') where.isActive = false;
+    if (q) {
+      where.OR = [
+        { slug: { contains: q, mode: 'insensitive' } },
+        {
+          metadata: {
+            some: {
+              locale,
+              key: 'name',
+              value: { contains: q, mode: 'insensitive' },
+            },
+          },
         },
-        insurances: {
-          select: {
-            id: true
-          }
-        }
-      },
-      orderBy: {
-        slug: 'asc'
-      }
-    });
+      ];
+    }
 
-    const formattedCompanies = companies.map(company => ({
+    const sort = (COMPANY_SORT_KEYS as readonly string[]).includes(sortParam ?? '')
+      ? (sortParam as CompanySortKey)
+      : 'slug';
+    const order = orderParam === 'desc' ? 'desc' : 'asc';
+
+    const paginated = pageParam !== null || perPageParam !== null;
+    const page = Math.max(1, Number(pageParam) || 1);
+    const perPage = Math.max(1, Math.min(200, Number(perPageParam) || 20));
+
+    const [companies, total] = await Promise.all([
+      prisma.company.findMany({
+        where,
+        include: {
+          metadata: { where: { locale } },
+          insurances: { select: { id: true } },
+        },
+        orderBy: { [sort]: order },
+        ...(paginated
+          ? { skip: (page - 1) * perPage, take: perPage }
+          : {}),
+      }),
+      prisma.company.count({ where }),
+    ]);
+
+    const formattedCompanies = companies.map((company) => ({
       id: company.id,
       slug: company.slug,
       logo: company.logo,
       isActive: company.isActive,
-      name: company.metadata.find(m => m.key === 'name')?.value || company.slug,
+      name: company.metadata.find((m) => m.key === 'name')?.value || company.slug,
       insuranceCount: company.insurances.length,
       createdBy: company.createdBy,
       updatedBy: company.updatedBy,
       createdAt: company.createdAt,
-      updatedAt: company.updatedAt
+      updatedAt: company.updatedAt,
     }));
 
     return NextResponse.json({
       success: true,
-      data: formattedCompanies
+      data: formattedCompanies,
+      total,
     });
   } catch (error) {
     console.error('Error fetching companies:', error);
