@@ -26,6 +26,7 @@ import {
   MdSearch,
   MdUnfoldMore,
 } from 'react-icons/md';
+import { formatDate } from '@/app/utils';
 
 export interface DataColumn<T = any> {
   key: string;
@@ -93,7 +94,7 @@ function renderCellValue(column: DataColumn, row: any): ReactNode {
     value.includes('T') &&
     !isNaN(Date.parse(value))
   ) {
-    return new Date(value).toLocaleDateString();
+    return formatDate(value);
   }
   if (typeof value === 'object') {
     return value.name || value.title || value.label || JSON.stringify(value);

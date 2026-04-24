@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import ImageUpload from '../../components/ImageUpload';
 import { useConfirm } from '../../components/DialogProvider';
 import DataTable, { DataColumn } from '../../components/DataTable';
+import { formatDateTime } from '@/app/utils';
 
 interface CompanyForm {
   slug: string;
@@ -589,11 +590,11 @@ export default function CompanyEditorPage() {
             Insurances linked: <strong>{company.insuranceCount}</strong>
           </span>
           <span>
-            Created: {new Date(company.createdAt).toLocaleString()}
+            Created: {formatDateTime(company.createdAt)}
             {company.createdBy ? ` by ${company.createdBy}` : ''}
           </span>
           <span>
-            Last updated: {new Date(company.updatedAt).toLocaleString()}
+            Last updated: {formatDateTime(company.updatedAt)}
             {company.updatedBy ? ` by ${company.updatedBy}` : ''}
           </span>
         </div>
