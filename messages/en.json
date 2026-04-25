@@ -1,7 +1,11 @@
 {
   "home": {
     "title": "Welcome",
-    "description": "This is the home page"
+    "description": "This is the home page",
+    "cta": {
+      "primary": "Browse Insurers",
+      "secondary": "How It Works"
+    }
   },
   "hero": {
     "title": "MC Broker",
@@ -13,8 +17,125 @@
     "services": "Services",
     "contact": "Contact"
   },
+  "why": {
+    "eyebrow": "Why MC Broker",
+    "title": "The easiest way to find the right cover",
+    "cards": {
+      "licensed": {
+        "title": "Licensed Broker",
+        "body": "Fully licensed in the Lao PDR — we work for you, not the insurer."
+      },
+      "compare": {
+        "title": "Compare 20+ Insurers",
+        "body": "Side-by-side quotes from every major insurance company in Laos."
+      },
+      "claims": {
+        "title": "Claim Support",
+        "body": "We stand by you when it matters most — from filing to payout."
+      },
+      "free": {
+        "title": "Free Consultation",
+        "body": "Talk to a real advisor at no cost. No obligation, no pressure."
+      }
+    }
+  },
+  "categories": {
+    "eyebrow": "Insurance Types",
+    "title": "Cover for every part of your life",
+    "subtitle": "Pick a category to filter insurers that offer it.",
+    "items": {
+      "life": "Life",
+      "health": "Health",
+      "accident": "Accident",
+      "travel": "Travel",
+      "home": "Home",
+      "car": "Vehicle",
+      "business": "Business"
+    }
+  },
+  "companies": {
+    "eyebrow": "Our Partners",
+    "title": "Insurance Companies",
+    "filter": {
+      "all": "All",
+      "life": "Life",
+      "accident": "Accident",
+      "health": "Health"
+    }
+  },
+  "how": {
+    "eyebrow": "How It Works",
+    "title": "Covered in three simple steps",
+    "steps": {
+      "1": {
+        "title": "Tell us what you need",
+        "body": "Share a few details about what you want to protect — it takes two minutes."
+      },
+      "2": {
+        "title": "Compare your options",
+        "body": "We pull quotes from trusted insurers and explain the differences in plain language."
+      },
+      "3": {
+        "title": "Get covered",
+        "body": "Pick the plan that fits. We handle the paperwork and stay with you for claims."
+      }
+    }
+  },
+  "faq": {
+    "eyebrow": "Questions",
+    "title": "Frequently asked",
+    "items": [
+      {
+        "q": "What does an insurance broker do?",
+        "a": "A broker compares plans from multiple insurance companies and recommends the best fit for your situation. Unlike an agent, we don't work for one insurer — we work for you."
+      },
+      {
+        "q": "Is using MC Broker free?",
+        "a": "Yes. You pay the standard premium set by the insurer; our service costs you nothing extra."
+      },
+      {
+        "q": "Which insurance companies can you quote?",
+        "a": "We work with over 20 insurers operating in Laos, including Allianz, AIA, Phongsavanh, Prudential, MSIG, Toyota Insurance and more."
+      },
+      {
+        "q": "How long does it take to get a quote?",
+        "a": "Most simple quotes come back within 24 hours. Complex cases (business, high-value property) can take a few business days."
+      },
+      {
+        "q": "Can you help with a claim?",
+        "a": "Yes — that's a big part of what we do. We help you file the claim, gather documents, and follow up with the insurer until it's resolved."
+      },
+      {
+        "q": "What languages do you work in?",
+        "a": "We serve clients in Lao, English, and Thai. Just let us know your preference when you reach out."
+      }
+    ]
+  },
+  "ctaBand": {
+    "title": "Not sure where to start?",
+    "body": "Talk to an advisor today. We'll help you figure out what you actually need — no sales pitch.",
+    "primary": "Browse insurers",
+    "phone": "Call us"
+  },
   "footer": {
-    "copyright": "All rights reserved"
+    "copyright": "All rights reserved",
+    "brandBlurb": "MC Broker is an independent insurance broker in Laos helping individuals and businesses find the right cover across 20+ insurers.",
+    "links": {
+      "title": "Quick Links",
+      "home": "Home",
+      "companies": "Partner Insurers",
+      "about": "How It Works"
+    },
+    "categories": {
+      "title": "Insurance Types"
+    },
+    "contact": {
+      "title": "Contact Us",
+      "addressLabel": "Address",
+      "address": "Vientiane, Lao PDR",
+      "phoneLabel": "Phone",
+      "phoneOffice": "Office: +856 21 123 456",
+      "phoneMobile": "Mobile: +856 20 123 456"
+    }
   }
 }
-

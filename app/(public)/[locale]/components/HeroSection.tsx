@@ -2,21 +2,10 @@
 
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import { Poppins, Inter } from "next/font/google";
+import { FaChevronLeft, FaChevronRight, FaArrowRight } from "react-icons/fa6";
 import { useTranslations, useLocale } from "next-intl";
-
-const poppins = Poppins({
-    subsets: ["latin"],
-    weight: ["600", "700", "800"],
-    display: "swap",
-});
-
-const inter = Inter({
-    subsets: ["latin"],
-    weight: ["300", "400", "500"],
-    display: "swap",
-});
+import { poppins, inter } from "../fonts";
+import Button from "./ui/Button";
 
 const FALLBACK_BANNERS = [
     "https://s3.mcins.la/mcins/banners/banner-bg.jpg",
@@ -35,6 +24,7 @@ interface Banner {
 
 export default function HeroSection() {
     const t = useTranslations("hero");
+    const tHome = useTranslations("home.cta");
     const locale = useLocale();
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isLoaded, setIsLoaded] = useState(false);
@@ -82,29 +72,28 @@ export default function HeroSection() {
         fetchBanners();
     }, [locale, t]);
 
-    // Auto-play functionality
     useEffect(() => {
         if (banners.length <= 1) return;
 
         const interval = setInterval(() => {
-            setCurrentIndex((prevIndex) => 
+            setCurrentIndex((prevIndex) =>
                 prevIndex === banners.length - 1 ? 0 : prevIndex + 1
             );
-        }, 5000); // Change slide every 5 seconds
+        }, 5000);
 
         return () => clearInterval(interval);
-    }, []);
+    }, [banners.length]);
 
     const goToPrevious = () => {
         if (banners.length <= 1) return;
-        setCurrentIndex((prevIndex) => 
+        setCurrentIndex((prevIndex) =>
             prevIndex === 0 ? banners.length - 1 : prevIndex - 1
         );
     };
 
     const goToNext = () => {
         if (banners.length <= 1) return;
-        setCurrentIndex((prevIndex) => 
+        setCurrentIndex((prevIndex) =>
             prevIndex === banners.length - 1 ? 0 : prevIndex + 1
         );
     };
@@ -114,8 +103,7 @@ export default function HeroSection() {
     };
 
     return (
-        <div className="relative w-full h-[500px] md:h-[600px] lg:h-[700px] overflow-hidden group">
-            {/* Carousel Images */}
+        <div className="relative w-full h-[520px] md:h-[580px] lg:h-[640px] overflow-hidden group">
             <div className="relative w-full h-full">
                 {banners.map((banner, index) => {
                     const image = (
@@ -125,10 +113,6 @@ export default function HeroSection() {
                             fill
                             className="object-cover"
                             priority={index === 0}
-                            style={{
-                                maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 60%, rgba(0,0,0,0.7) 85%, rgba(0,0,0,0) 100%)',
-                                WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 60%, rgba(0,0,0,0.7) 85%, rgba(0,0,0,0) 100%)'
-                            }}
                         />
                     );
                     return (
@@ -138,7 +122,6 @@ export default function HeroSection() {
                                 index === currentIndex ? "opacity-100" : "opacity-0"
                             }`}
                         >
-                            <div className="absolute inset-0 bg-black/20 z-1" />
                             {banner.linkUrl ? (
                                 <a href={banner.linkUrl} className="block w-full h-full">
                                     {image}
@@ -146,60 +129,69 @@ export default function HeroSection() {
                             ) : (
                                 image
                             )}
+                            <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-slate-950/50 to-slate-950/20 z-1" />
+                            <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent to-slate-50 z-1" />
                         </div>
                     );
                 })}
             </div>
 
-            {/* Overlay Text */}
             <div className={`absolute inset-0 flex flex-col items-start justify-center z-10 text-white px-6 md:px-12 lg:px-24 transition-all duration-1000 transform ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-                <h1 
-                    className={`${poppins.className} text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 tracking-tight drop-shadow-lg`}
-                >
-                    {heroContent.title}
-                </h1>
-                <div className="flex items-center gap-4 mb-6">
-                    <div className="h-1.5 w-24 bg-linear-to-r from-secondary to-orange-500 rounded-full shadow-lg"></div>
+                <div className="max-w-3xl">
+                    <h1
+                        className={`${poppins.className} text-4xl md:text-5xl lg:text-6xl font-extrabold mb-5 tracking-tight drop-shadow-lg`}
+                    >
+                        {heroContent.title}
+                    </h1>
+                    <div className="h-1.5 w-20 bg-gradient-to-r from-secondary to-accent rounded-full shadow-lg mb-5"></div>
+                    <p
+                        className={`${inter.className} text-lg md:text-xl lg:text-2xl font-light tracking-wide drop-shadow-md max-w-2xl leading-relaxed mb-8`}
+                    >
+                        {heroContent.subtitle}
+                    </p>
+                    <div className="flex flex-wrap gap-3">
+                        <Button href="#company-list" variant="secondary" size="lg">
+                            {tHome("primary")}
+                            <FaArrowRight size={14} />
+                        </Button>
+                        <Button href="#how-it-works" variant="ghost" size="lg">
+                            {tHome("secondary")}
+                        </Button>
+                    </div>
                 </div>
-                <p 
-                    className={`${inter.className} text-xl md:text-2xl lg:text-3xl font-light tracking-wide drop-shadow-md max-w-2xl leading-relaxed`}
-                >
-                    {heroContent.subtitle}
-                </p>
             </div>
 
-            {/* Navigation Controls - Only show if more than 1 banner */}
             {banners.length > 1 && (
                 <>
                     <button
-                onClick={goToPrevious}
+                        onClick={goToPrevious}
                         className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-primary/80 text-white p-3 md:p-4 rounded-full transition-all duration-300 z-20 backdrop-blur-sm opacity-0 group-hover:opacity-100 translate-x-[-20px] group-hover:translate-x-0"
-                aria-label="Previous slide"
-            >
-                <FaChevronLeft size={20} />
+                        aria-label="Previous slide"
+                    >
+                        <FaChevronLeft size={18} />
                     </button>
 
                     <button
-                onClick={goToNext}
+                        onClick={goToNext}
                         className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-primary/80 text-white p-3 md:p-4 rounded-full transition-all duration-300 z-20 backdrop-blur-sm opacity-0 group-hover:opacity-100 translate-x-[20px] group-hover:translate-x-0"
-                aria-label="Next slide"
-            >
-                <FaChevronRight size={20} />
+                        aria-label="Next slide"
+                    >
+                        <FaChevronRight size={18} />
                     </button>
 
-                    <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 z-20">
-                {banners.map((_, index) => (
-                    <button
-                        key={index}
-                        onClick={() => goToSlide(index)}
-                                className={`h-3 rounded-full transition-all duration-300 shadow-sm ${
-                            index === currentIndex
-                                        ? "bg-secondary w-10"
-                                        : "bg-white/60 hover:bg-white w-3"
-                        }`}
-                        aria-label={`Go to slide ${index + 1}`}
-                    />
-                ))}
+                    <div className="absolute bottom-24 left-1/2 -translate-x-1/2 flex gap-3 z-20">
+                        {banners.map((_, index) => (
+                            <button
+                                key={index}
+                                onClick={() => goToSlide(index)}
+                                className={`h-2.5 rounded-full transition-all duration-300 shadow-sm ${
+                                    index === currentIndex
+                                        ? "bg-accent w-10"
+                                        : "bg-white/60 hover:bg-white w-2.5"
+                                }`}
+                                aria-label={`Go to slide ${index + 1}`}
+                            />
+                        ))}
                     </div>
                 </>
             )}

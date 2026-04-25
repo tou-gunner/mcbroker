@@ -8,6 +8,7 @@
   --primary-dark: #0F5A8A;
   --secondary: #FF0000;
   --secondary-dark: #CC0000;
+  --accent: #F27E2E;
 }
 
 @theme inline {
@@ -17,6 +18,7 @@
   --color-primary-dark: var(--primary-dark);
   --color-secondary: var(--secondary);
   --color-secondary-dark: var(--secondary-dark);
+  --color-accent: var(--accent);
   --font-sans: var(--font-phetsarath);
 }
 
