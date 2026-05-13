@@ -103,7 +103,7 @@ export default function HeroSection() {
     };
 
     return (
-        <div className="relative w-full h-[520px] md:h-[580px] lg:h-[640px] overflow-hidden group">
+        <div className="relative w-full h-130 md:h-145 lg:h-160 overflow-hidden group">
             <div className="relative w-full h-full">
                 {banners.map((banner, index) => {
                     const image = (
@@ -129,8 +129,8 @@ export default function HeroSection() {
                             ) : (
                                 image
                             )}
-                            <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-slate-950/50 to-slate-950/20 z-1" />
-                            <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent to-slate-50 z-1" />
+                            <div className="absolute inset-0 bg-linear-to-r from-slate-950/80 via-slate-950/50 to-slate-950/20 z-1" />
+                            <div className="absolute inset-x-0 bottom-0 h-32 bg-linear-to-b from-transparent to-slate-50 z-1" />
                         </div>
                     );
                 })}
@@ -143,7 +143,7 @@ export default function HeroSection() {
                     >
                         {heroContent.title}
                     </h1>
-                    <div className="h-1.5 w-20 bg-gradient-to-r from-secondary to-accent rounded-full shadow-lg mb-5"></div>
+                    <div className="h-1.5 w-20 bg-linear-to-r from-secondary to-accent rounded-full shadow-lg mb-5"></div>
                     <p
                         className={`${inter.className} text-lg md:text-xl lg:text-2xl font-light tracking-wide drop-shadow-md max-w-2xl leading-relaxed mb-8`}
                     >
@@ -165,7 +165,7 @@ export default function HeroSection() {
                 <>
                     <button
                         onClick={goToPrevious}
-                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-primary/80 text-white p-3 md:p-4 rounded-full transition-all duration-300 z-20 backdrop-blur-sm opacity-0 group-hover:opacity-100 translate-x-[-20px] group-hover:translate-x-0"
+                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-primary/80 text-white p-3 md:p-4 rounded-full transition-all duration-300 z-20 backdrop-blur-sm opacity-0 group-hover:opacity-100 -translate-x-5 group-hover:translate-x-0"
                         aria-label="Previous slide"
                     >
                         <FaChevronLeft size={18} />
@@ -173,7 +173,7 @@ export default function HeroSection() {
 
                     <button
                         onClick={goToNext}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-primary/80 text-white p-3 md:p-4 rounded-full transition-all duration-300 z-20 backdrop-blur-sm opacity-0 group-hover:opacity-100 translate-x-[20px] group-hover:translate-x-0"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-primary/80 text-white p-3 md:p-4 rounded-full transition-all duration-300 z-20 backdrop-blur-sm opacity-0 group-hover:opacity-100 translate-x-5 group-hover:translate-x-0"
                         aria-label="Next slide"
                     >
                         <FaChevronRight size={18} />

@@ -6,9 +6,9 @@ export default function CtaBand() {
     const t = useTranslations("ctaBand");
 
     return (
-        <section className="w-full py-16 md:py-20 px-6 md:px-10">
+        <section id="contact" className="w-full py-16 md:py-20 px-6 md:px-10 scroll-mt-20">
             <div className="max-w-6xl mx-auto">
-                <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary-dark to-slate-900 text-white p-8 md:p-12 lg:p-16">
+                <div className="relative overflow-hidden rounded-3xl bg-linear-to-br from-primary via-primary-dark to-slate-900 text-white p-8 md:p-12 lg:p-16">
                     <div className="absolute -top-24 -right-24 w-72 h-72 bg-accent/20 rounded-full blur-3xl pointer-events-none" />
                     <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-primary/40 rounded-full blur-3xl pointer-events-none" />
 

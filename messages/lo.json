@@ -13,6 +13,9 @@
   },
   "navigation": {
     "home": "ໜ້າຫຼັກ",
+    "companies": "ບໍລິສັດປະກັນໄພ",
+    "howItWorks": "ວິທີການເຮັດວຽກ",
+    "faq": "ຄຳຖາມ",
     "about": "ກ່ຽວກັບ",
     "services": "ບໍລິການ",
     "contact": "ຕິດຕໍ່"

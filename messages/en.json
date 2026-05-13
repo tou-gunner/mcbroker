@@ -13,6 +13,9 @@
   },
   "navigation": {
     "home": "Home",
+    "companies": "Insurers",
+    "howItWorks": "How It Works",
+    "faq": "FAQ",
     "about": "About",
     "services": "Services",
     "contact": "Contact"

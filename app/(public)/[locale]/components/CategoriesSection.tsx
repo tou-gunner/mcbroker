@@ -54,7 +54,7 @@ export default function CategoriesSection() {
                     <button
                         key={slug}
                         onClick={() => handleClick(slug)}
-                        className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br ${accent} bg-slate-50 ring-1 ring-slate-200 hover:ring-primary hover:shadow-lg hover:-translate-y-1 transition-all duration-300 p-5 flex flex-col items-center gap-3 text-center cursor-pointer`}
+                        className={`group relative overflow-hidden rounded-2xl bg-linear-to-br ${accent} bg-slate-50 ring-1 ring-slate-200 hover:ring-primary hover:shadow-lg hover:-translate-y-1 transition-all duration-300 p-5 flex flex-col items-center gap-3 text-center cursor-pointer`}
                     >
                         <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center">
                             <Icon size={22} />
