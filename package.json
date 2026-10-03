@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "prisma:generate": "prisma generate",
-    "check-db": "tsx check-db.ts"
+    "check-db": "tsx check-db.ts",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1035.0",
@@ -47,6 +48,7 @@
     "tiptap": "^1.32.2"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4.2.4",
     "@types/bcryptjs": "^3.0.0",
     "@types/node": "^25.6.0",
@@ -54,10 +56,11 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "baseline-browser-mapping": "^2.10.21",
-    "eslint": "^10.2.1",
+    "eslint": "^9.39.5",
     "eslint-config-next": "16.2.4",
     "tailwindcss": "^4.2.4",
     "tsx": "^4.21.0",
     "typescript": "^6.0.3"
-  }
+  },
+  "packageManager": "pnpm@10.34.5"
 }

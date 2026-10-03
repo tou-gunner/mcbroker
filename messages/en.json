@@ -1,51 +1,36 @@
 {
   "home": {
-    "title": "Welcome",
-    "description": "This is the home page",
     "cta": {
-      "primary": "Browse Insurers",
-      "secondary": "How It Works"
+      "primary": "Explore insurance",
+      "secondary": "Talk to an advisor"
     }
   },
   "hero": {
-    "title": "MC Broker",
-    "subtitle": "Your Trusted Insurance Partner"
+    "eyebrow": "A little clarity. A little peace of mind.",
+    "title": "Protect what matters. Understand your options.",
+    "subtitle": "Explore insurance for your life, family, and business with guidance from MC Broker.",
+    "note": "Explore at your own pace. Ask when you need us.",
+    "artLabel": "Life happens. Plan ahead.",
+    "artTitle": "For the things you value.",
+    "featured": "View featured information"
   },
   "navigation": {
     "home": "Home",
+    "types": "Insurance types",
     "companies": "Insurers",
-    "howItWorks": "How It Works",
+    "howItWorks": "How it works",
     "faq": "FAQ",
-    "about": "About",
-    "services": "Services",
-    "contact": "Contact"
-  },
-  "why": {
-    "eyebrow": "Why MC Broker",
-    "title": "The easiest way to find the right cover",
-    "cards": {
-      "licensed": {
-        "title": "Licensed Broker",
-        "body": "Fully licensed in the Lao PDR — we work for you, not the insurer."
-      },
-      "compare": {
-        "title": "Compare 20+ Insurers",
-        "body": "Side-by-side quotes from every major insurance company in Laos."
-      },
-      "claims": {
-        "title": "Claim Support",
-        "body": "We stand by you when it matters most — from filing to payout."
-      },
-      "free": {
-        "title": "Free Consultation",
-        "body": "Talk to a real advisor at no cost. No obligation, no pressure."
-      }
-    }
+    "contact": "Talk to an advisor",
+    "language": "Language",
+    "main": "Main navigation",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "skip": "Skip to content"
   },
   "categories": {
-    "eyebrow": "Insurance Types",
-    "title": "Cover for every part of your life",
-    "subtitle": "Pick a category to filter insurers that offer it.",
+    "eyebrow": "Start with what matters",
+    "title": "What would you like to protect?",
+    "subtitle": "Your priorities are personal. Find a place to start, then explore the insurers offering that cover.",
     "items": {
       "life": "Life",
       "health": "Health",
@@ -54,91 +39,103 @@
       "home": "Home",
       "car": "Vehicle",
       "business": "Business"
+    },
+    "descriptions": {
+      "life": "Their future",
+      "health": "Your wellbeing",
+      "accident": "The unexpected",
+      "travel": "Your next trip",
+      "home": "Your own space",
+      "car": "Every journey",
+      "business": "What you build"
     }
   },
   "companies": {
-    "eyebrow": "Our Partners",
-    "title": "Insurance Companies",
-    "filter": {
-      "all": "All",
-      "life": "Life",
-      "accident": "Accident",
-      "health": "Health"
-    }
+    "eyebrow": "Explore your options",
+    "title": "Find an insurer. Find your fit.",
+    "subtitle": "Get to know the insurers and explore the types of cover they offer.",
+    "searchLabel": "Search insurers",
+    "searchPlaceholder": "Search by company name",
+    "filterLabel": "Type of insurance",
+    "all": "All",
+    "results": "{count, plural, =0 {No insurers found} one {# insurer found} other {# insurers found}}",
+    "clear": "Clear filters",
+    "loading": "Loading insurers…",
+    "viewPlans": "View plans",
+    "unnamed": "Insurance company",
+    "errorTitle": "We couldn’t load the insurers",
+    "errorBody": "Please try again. Your search and filters will be kept.",
+    "retry": "Try again",
+    "emptyTitle": "More options are on the way",
+    "emptyBody": "There are no insurers to display right now. You can still check the advisor contact options below.",
+    "askAdvisor": "Find advisor contact options",
+    "noMatches": "No match just yet",
+    "noMatchesBody": "No insurers match “{query}” in {category}. Try another name or clear your filters."
   },
   "how": {
-    "eyebrow": "How It Works",
-    "title": "Covered in three simple steps",
+    "eyebrow": "A clearer path forward",
+    "title": "A conversation can make it simpler.",
+    "subtitle": "Take it one step at a time, with room to ask the questions that matter to you.",
     "steps": {
       "1": {
-        "title": "Tell us what you need",
-        "body": "Share a few details about what you want to protect — it takes two minutes."
+        "title": "Share your needs",
+        "body": "Think about what you want to protect, your priorities, and the questions you would like to ask."
       },
       "2": {
-        "title": "Compare your options",
-        "body": "We pull quotes from trusted insurers and explain the differences in plain language."
+        "title": "Discuss your options",
+        "body": "Review available plans with an advisor. Ask about the cover, costs, and conditions before deciding."
       },
       "3": {
-        "title": "Get covered",
-        "body": "Pick the plan that fits. We handle the paperwork and stay with you for claims."
+        "title": "Arrange your cover",
+        "body": "When you find a suitable plan, discuss the application and next steps with your advisor."
       }
     }
   },
   "faq": {
-    "eyebrow": "Questions",
-    "title": "Frequently asked",
+    "eyebrow": "A few helpful answers",
+    "title": "Good questions. Clearer choices.",
+    "subtitle": "A starting point for understanding your options.",
+    "contact": "Have another question?",
     "items": [
       {
-        "q": "What does an insurance broker do?",
-        "a": "A broker compares plans from multiple insurance companies and recommends the best fit for your situation. Unlike an agent, we don't work for one insurer — we work for you."
+        "q": "Where should I start?",
+        "a": "Choose what you want to protect in the insurance types section. Then browse the insurers and open a plan to read more."
       },
       {
-        "q": "Is using MC Broker free?",
-        "a": "Yes. You pay the standard premium set by the insurer; our service costs you nothing extra."
+        "q": "Can I explore without signing up?",
+        "a": "Yes. You can browse insurers and read product information without creating an account or sharing contact details."
       },
       {
-        "q": "Which insurance companies can you quote?",
-        "a": "We work with over 20 insurers operating in Laos, including Allianz, AIA, Phongsavanh, Prudential, MSIG, Toyota Insurance and more."
+        "q": "What should I look for in a plan?",
+        "a": "Read the coverage, exclusions, limits, and conditions provided for the product. An advisor can help you discuss any details that need clarification."
       },
       {
-        "q": "How long does it take to get a quote?",
-        "a": "Most simple quotes come back within 24 hours. Complex cases (business, high-value property) can take a few business days."
+        "q": "Can I buy insurance on this website?",
+        "a": "This website helps you explore insurance and contact an advisor. Applications and policy arrangements are discussed directly with the advisor."
       },
       {
-        "q": "Can you help with a claim?",
-        "a": "Yes — that's a big part of what we do. We help you file the claim, gather documents, and follow up with the insurer until it's resolved."
-      },
-      {
-        "q": "What languages do you work in?",
-        "a": "We serve clients in Lao, English, and Thai. Just let us know your preference when you reach out."
+        "q": "How do I contact an advisor?",
+        "a": "Use the phone or WhatsApp options in the contact section when available. You choose whether to place a call or send a message."
       }
     ]
   },
-  "ctaBand": {
-    "title": "Not sure where to start?",
-    "body": "Talk to an advisor today. We'll help you figure out what you actually need — no sales pitch.",
-    "primary": "Browse insurers",
-    "phone": "Call us"
+  "contact": {
+    "eyebrow": "Let’s talk it through",
+    "title": "You don’t have to figure it out alone.",
+    "body": "Whether you have a plan in mind or a few questions, start a conversation about what matters to you.",
+    "call": "Call an advisor",
+    "whatsapp": "Chat on WhatsApp",
+    "loading": "Loading contact options…",
+    "unavailable": "Some contact options are not available yet. Please check back later.",
+    "message": "Hello MC Broker, I would like to discuss my insurance options. I am viewing {url}"
   },
   "footer": {
-    "copyright": "All rights reserved",
-    "brandBlurb": "MC Broker is an independent insurance broker in Laos helping individuals and businesses find the right cover across 20+ insurers.",
+    "brandBlurb": "A place to explore insurance for your life, family, and business in Laos. Understand your options, one step at a time.",
     "links": {
-      "title": "Quick Links",
-      "home": "Home",
-      "companies": "Partner Insurers",
-      "about": "How It Works"
+      "title": "Explore"
     },
-    "categories": {
-      "title": "Insurance Types"
-    },
-    "contact": {
-      "title": "Contact Us",
-      "addressLabel": "Address",
-      "address": "Vientiane, Lao PDR",
-      "phoneLabel": "Phone",
-      "phoneOffice": "Office: +856 21 123 456",
-      "phoneMobile": "Mobile: +856 20 123 456"
-    }
+    "contactTitle": "Get in touch",
+    "copyright": "All rights reserved",
+    "tagline": "More clarity. More confidence."
   }
 }

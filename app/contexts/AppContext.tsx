@@ -1,100 +1,82 @@
-'use client'
+"use client";
 
-import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react'
-import { useLocale } from 'next-intl'
-import { CompanyResponse } from '@/app/interfaces'
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { useLocale } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
+import type { CompanyResponse } from '@/app/interfaces/company';
+import { categoryFilter, normalizeSearch, type CategoryFilter } from '@/app/utils/catalog';
 
-interface AppContextType {
-  // Company data
-  companies: CompanyResponse[]
-  setCompanies: (companies: CompanyResponse[]) => void
-  
-  // Loading states
-  isLoading: boolean
-  setIsLoading: (loading: boolean) => void
-  
-  // Error handling
-  error: string | null
-  setError: (error: string | null) => void
-  
-  // Filters
-  selectedFilter: string
-  setSelectedFilter: (filter: string) => void
-  
-  // Utility functions
-  fetchCompanies: () => Promise<void>
-  getFilteredCompanies: (filter?: string) => CompanyResponse[]
+interface CatalogState {
+  companies: CompanyResponse[];
+  filteredCompanies: CompanyResponse[];
+  selectedFilter: CategoryFilter;
+  query: string;
+  status: 'loading' | 'ready' | 'error';
+  setSelectedFilter: (filter: CategoryFilter) => void;
+  setQuery: (query: string) => void;
+  clearFilters: () => void;
+  retry: () => void;
 }
+const AppContext = createContext<CatalogState | null>(null);
 
-const AppContext = createContext<AppContextType | undefined>(undefined)
+export function AppProvider({ children }: { children: ReactNode }) {
+  const locale = useLocale();
+  const searchParams = useSearchParams();
+  const selectedFilter = categoryFilter(searchParams.get('category'));
+  const query = searchParams.get('q') ?? '';
+  const [attempt, setAttempt] = useState(0);
+  const [result, setResult] = useState<{ locale: string; attempt: number; companies: CompanyResponse[]; status: 'ready' | 'error' } | null>(null);
 
-interface AppProviderProps {
-  children: ReactNode
-}
-
-export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
-  const locale = useLocale()
-  const [companies, setCompanies] = useState<CompanyResponse[]>([])
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [selectedFilter, setSelectedFilter] = useState('all')
-
-  const fetchCompanies = useCallback(async () => {
-    setIsLoading(true)
-    setError(null)
-
-    try {
-      const response = await fetch(`/api/companies?locale=${locale}`)
-      const data = await response.json()
-
-      if (data.success) {
-        setCompanies(data.data)
-      } else {
-        setError(data.message || 'Failed to fetch companies')
+  useEffect(() => {
+    const controller = new AbortController();
+    async function load() {
+      try {
+        const response = await fetch(`/api/companies?locale=${locale}`, { signal: controller.signal });
+        if (!response.ok) throw new Error('Company request failed');
+        const data = await response.json();
+        if (!data.success || !Array.isArray(data.data)) throw new Error('Invalid company response');
+        if (!controller.signal.aborted) setResult({ locale, attempt, companies: data.data, status: 'ready' });
+      } catch {
+        if (!controller.signal.aborted) setResult({ locale, attempt, companies: [], status: 'error' });
       }
-    } catch (err) {
-      setError('An error occurred while fetching companies')
-      console.error('Error fetching companies:', err)
-    } finally {
-      setIsLoading(false)
     }
-  }, [locale])
+    void load();
+    return () => controller.abort();
+  }, [locale, attempt]);
 
-  const getFilteredCompanies = useCallback((filter?: string) => {
-    const activeFilter = filter ?? selectedFilter
-    
-    if (activeFilter === 'all') {
-      return companies
+  const current = result?.locale === locale && result.attempt === attempt ? result : null;
+  const companies = current?.companies ?? [];
+  const needle = normalizeSearch(query);
+  const filteredCompanies = companies.filter(company =>
+    (selectedFilter === 'all' || company.available_insurances.includes(selectedFilter)) && normalizeSearch(company.name).includes(needle)
+  );
+
+  function updateUrl(changes: { category?: CategoryFilter; q?: string }, replace = false) {
+    const url = new URL(window.location.href);
+    if (changes.category !== undefined) {
+      if (changes.category === 'all') url.searchParams.delete('category');
+      else url.searchParams.set('category', changes.category);
     }
-    
-    return companies.filter(company => 
-      company.available_insurances.includes(activeFilter)
-    )
-  }, [companies, selectedFilter])
-
-  const value: AppContextType = {
-    companies,
-    setCompanies,
-    isLoading,
-    setIsLoading,
-    error,
-    setError,
-    selectedFilter,
-    setSelectedFilter,
-    fetchCompanies,
-    getFilteredCompanies,
+    if (changes.q !== undefined) {
+      if (changes.q) url.searchParams.set('q', changes.q);
+      else url.searchParams.delete('q');
+    }
+    const next = `${url.pathname}${url.search}${url.hash}`;
+    if (replace) window.history.replaceState(null, '', next);
+    else window.history.pushState(null, '', next);
   }
 
-  return <AppContext.Provider value={value}>{children}</AppContext.Provider>
+  return <AppContext.Provider value={{
+    companies, filteredCompanies, query, selectedFilter, status: current?.status ?? 'loading',
+    setSelectedFilter: category => updateUrl({ category }),
+    setQuery: q => updateUrl({ q }, true),
+    clearFilters: () => updateUrl({ category: 'all', q: '' }),
+    retry: () => setAttempt(value => value + 1),
+  }}>{children}</AppContext.Provider>;
 }
 
-export const useAppContext = () => {
-  const context = useContext(AppContext)
-  
-  if (context === undefined) {
-    throw new Error('useAppContext must be used within an AppProvider')
-  }
-  
-  return context
+export function useAppContext() {
+  const context = useContext(AppContext);
+  if (!context) throw new Error('Catalog components require AppProvider');
+  return context;
 }
-

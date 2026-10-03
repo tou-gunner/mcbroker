@@ -5,7 +5,9 @@ import { routing } from '@/i18n/routing';
 import { notFound } from 'next/navigation';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
-import { AppProvider } from "@/app/contexts";
+import PublicSiteProvider from './components/PublicSiteProvider';
+import { inter } from './fonts';
+import './public.css';
 import NavigationBar from "./components/NavigationBar";
 import Footer from "./components/Footer";
 
@@ -47,7 +49,7 @@ export default async function LocaleLayout({
   const { locale } = await params;
 
   // Ensure that the incoming `locale` is valid
-  if (!routing.locales.includes(locale as any)) {
+  if (!routing.locales.some(supported => supported === locale)) {
     notFound();
   }
 
@@ -57,16 +59,15 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale}>
-      <body className={`${phetsarath.variable} antialiased`}>
+      <body className={`public-site ${phetsarath.variable} ${inter.variable} antialiased`}>
         <NextIntlClientProvider messages={messages}>
-          <AppProvider>
+          <PublicSiteProvider>
             <NavigationBar />
-            {children}
+            <main id="main-content" tabIndex={-1}>{children}</main>
             <Footer />
-          </AppProvider>
+          </PublicSiteProvider>
         </NextIntlClientProvider>
       </body>
     </html>
   );
 }
-

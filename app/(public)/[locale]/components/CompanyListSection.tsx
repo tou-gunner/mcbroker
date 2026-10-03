@@ -1,86 +1,48 @@
-'use client'
+"use client";
+import { useTranslations } from 'next-intl';
+import { FaArrowRight, FaBuilding, FaMagnifyingGlass, FaRotateRight } from 'react-icons/fa6';
+import { Link } from '@/i18n/routing';
+import { useAppContext } from '@/app/contexts';
+import { CATEGORY_SLUGS, type CategorySlug } from '@/app/utils/catalog';
+import type { CompanyResponse } from '@/app/interfaces/company';
+import Section from './ui/Section';
+import AssetImage from './ui/AssetImage';
+import Button from './ui/Button';
 
-import { useEffect } from 'react'
-import { useTranslations } from 'next-intl'
-import { Link } from '@/i18n/routing'
-import { useAppContext } from '@/app/contexts'
-import { CompanyResponse } from '@/app/interfaces/company'
+export function CatalogSkeleton() {
+  const t = useTranslations('companies');
+  return <div className="catalog-skeleton" role="status"><span className="sr-only">{t('loading')}</span><div className="insurer-grid" aria-hidden="true">{[0, 1, 2].map(i => <div key={i} className="skeleton-card"><div /><span /><span /></div>)}</div></div>;
+}
 
 export default function CompanyListSection() {
-    const t = useTranslations('companies')
-    const {
-        selectedFilter,
-        setSelectedFilter,
-        isLoading,
-        fetchCompanies,
-        getFilteredCompanies
-    } = useAppContext()
-
-    useEffect(() => {
-        fetchCompanies()
-    }, [fetchCompanies])
-
-    const filterOptions = [
-        { label: t('filter.all'), value: 'all' },
-        { label: t('filter.life'), value: 'life' },
-        { label: t('filter.accident'), value: 'accident' },
-        { label: t('filter.health'), value: 'health' },
-    ]
-
-    const filteredCompanies = getFilteredCompanies()
-
-    return (
-        <section id="company-list" className="w-full bg-slate-50 py-16 md:py-24 px-6 md:px-10 scroll-mt-20">
-            <div className="max-w-6xl mx-auto flex flex-col items-center gap-8">
-                <div className="text-center">
-                    <div className="text-accent text-sm font-semibold tracking-[0.2em] uppercase mb-3">
-                        {t('eyebrow')}
-                    </div>
-                    <h2 className="text-3xl md:text-4xl font-bold text-slate-900">
-                        {t('title')}
-                    </h2>
-                </div>
-                <div className="flex items-center justify-center gap-2 md:gap-3 flex-wrap">
-                    {filterOptions.map((option) => (
-                        <button
-                            key={option.value}
-                            onClick={() => setSelectedFilter(option.value)}
-                            className={`${selectedFilter === option.value
-                                    ? 'bg-primary text-white shadow-md'
-                                    : 'bg-white text-slate-700 hover:bg-slate-100 ring-1 ring-slate-200'
-                                } text-sm font-medium px-5 py-2.5 rounded-full cursor-pointer transition-all duration-200`}
-                        >
-                            {option.label}
-                        </button>
-                    ))}
-                </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-5 w-full">
-                    {isLoading ? (
-                        <div className="col-span-full flex items-center justify-center py-16">
-                            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
-                        </div>
-                    ) : (
-                        filteredCompanies.map((company) => (
-                            <CompanyCard key={company.id} company={company} />
-                        ))
-                    )}
-                </div>
-            </div>
-        </section>
-    );
+  const t = useTranslations('companies');
+  const categories = useTranslations('categories.items');
+  const { companies, filteredCompanies, selectedFilter, query, status, setSelectedFilter, setQuery, clearFilters, retry } = useAppContext();
+  const hasFilters = selectedFilter !== 'all' || query.length > 0;
+  return <Section id="company-list" eyebrow={t('eyebrow')} title={t('title')} subtitle={t('subtitle')} className="directory-section">
+    <div className="directory-toolbar">
+      <div className="search-field"><label htmlFor="insurer-search">{t('searchLabel')}</label><div className="search-input"><FaMagnifyingGlass aria-hidden="true" /><input id="insurer-search" type="search" value={query} placeholder={t('searchPlaceholder')} onChange={event => setQuery(event.target.value)} /></div></div>
+      <fieldset className="filter-field"><legend>{t('filterLabel')}</legend><div className="filter-list">
+        {(['all', ...CATEGORY_SLUGS] as const).map(slug => <button key={slug} type="button" className="filter-chip" aria-pressed={selectedFilter === slug} onClick={() => setSelectedFilter(slug)}>{slug === 'all' ? t('all') : categories(slug)}</button>)}
+      </div></fieldset>
+    </div>
+    <div className="directory-meta"><p role="status" aria-live="polite" aria-atomic="true">{status === 'ready' ? t('results', { count: filteredCompanies.length }) : status === 'loading' ? t('loading') : t('errorTitle')}</p>{hasFilters && <button type="button" className="text-button" onClick={clearFilters}>{t('clear')}</button>}</div>
+    {status === 'loading' && <CatalogSkeleton />}
+    {status === 'error' && <div className="catalog-state" role="alert"><FaRotateRight aria-hidden="true" /><h3>{t('errorTitle')}</h3><p>{t('errorBody')}</p><Button onClick={retry}>{t('retry')}</Button></div>}
+    {status === 'ready' && filteredCompanies.length > 0 && <div className="insurer-grid">{filteredCompanies.map(company => <CompanyCard key={company.id} company={company} />)}</div>}
+    {status === 'ready' && filteredCompanies.length === 0 && <div className="catalog-state"><FaMagnifyingGlass aria-hidden="true" /><h3>{t(companies.length ? 'noMatches' : 'emptyTitle')}</h3><p>{companies.length ? t('noMatchesBody', { query: query.trim() || '—', category: selectedFilter === 'all' ? t('all') : categories(selectedFilter) }) : t('emptyBody')}</p>{companies.length ? <Button variant="secondary" onClick={clearFilters}>{t('clear')}</Button> : <Button href="#contact">{t('askAdvisor')}</Button>}</div>}
+  </Section>;
 }
 
 function CompanyCard({ company }: { company: CompanyResponse }) {
-    return (
-        <Link
-            href={`/company/${company.id}`}
-            className="group bg-white rounded-2xl p-4 aspect-[4/3] flex items-center justify-center ring-1 ring-slate-200 hover:ring-primary hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
-        >
-            <img
-                src={company.logo || ''}
-                alt={company.name || ''}
-                className="max-h-20 max-w-full object-contain"
-            />
-        </Link>
-    )
+  const t = useTranslations('companies');
+  const categories = useTranslations('categories.items');
+  const slugs = company.available_insurances.filter((slug): slug is CategorySlug => CATEGORY_SLUGS.includes(slug as CategorySlug));
+  return <Link href={`/company/${company.id}`} className="insurer-card" prefetch={false}>
+    <div className="insurer-card-top"><AssetImage src={company.logo} alt="" sizes="112px" className="insurer-logo" fallback={<FaBuilding />} /><span className="card-arrow" aria-hidden="true"><FaArrowRight /></span></div>
+    <h3>{company.name || t('unnamed')}</h3>
+    {company.description && <p className="insurer-description">{company.description}</p>}
+    <div className="insurer-categories">{slugs.map(slug => <span key={slug}>{categories(slug)}</span>)}</div>
+    <span className="card-link">{t('viewPlans')}<FaArrowRight aria-hidden="true" /></span>
+  </Link>;
 }
