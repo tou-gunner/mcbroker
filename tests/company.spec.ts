@@ -48,6 +48,7 @@ test('company advisor links include context in both languages and reset after na
     await page.goto(`/${locale}/company/${populatedId}?category=health#contact`);
     const link = page.locator('#contact a[href^="https://wa.me/"]');
     await expect(link).toBeVisible();
+    await expect(link).toHaveAttribute('href', /Allianz%20Insurance%20Laos/);
     const url = new URL((await link.getAttribute('href'))!);
     expect(url.pathname).toBe('/8562055550102');
     expect(url.searchParams.get('text')).toContain('Allianz Insurance Laos (AGL)');
