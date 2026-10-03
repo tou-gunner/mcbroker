@@ -289,3 +289,80 @@ html[lang="lo"] .public-site :where(.company-breadcrumbs, .company-categories li
   html[lang="lo"] .public-site .company-page h1 { font-size: 38px; }
   html[lang="lo"] .public-site .company-page h2 { font-size: 32px; }
 }
+
+/* Insurance details: readable CMS content, isolated from the admin editor. */
+.public-site .insurance-page { overflow-wrap: anywhere; }
+.public-site .insurance-page h1 { font-size: 34px; line-height: 1.2; letter-spacing: -.035em; font-weight: 700; }
+.public-site .insurance-page h2 { font-size: 26px; line-height: 1.35; letter-spacing: -.025em; font-weight: 700; }
+.public-site .insurance-intro { max-width: 900px; padding-block: 4px 40px; }
+.public-site .insurance-insurer { display: inline-flex; align-items: center; gap: 16px; color: var(--public-primary-hover); font-size: 14px; margin-bottom: 28px; max-width: 100%; }
+.public-site .insurance-insurer > span { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.public-site .insurance-insurer > span svg { flex-shrink: 0; width: 12px; }
+.public-site .insurance-insurer:hover > span { text-decoration: underline; text-underline-offset: 4px; }
+.public-site .insurance-insurer-logo { width: 64px; height: 56px; flex-shrink: 0; border: 1px solid var(--public-border); border-radius: 12px; background: white; font-size: 22px; }
+.public-site .insurance-insurer-logo img { padding: 8px; }
+.public-site .insurance-category { display: table; color: #315e4b; background: var(--public-accent); font-size: 13px; padding: 5px 12px; border-radius: 6px; margin-bottom: 16px; }
+.public-site .insurance-description { margin-top: 20px; color: var(--public-muted); white-space: pre-line; max-width: 65ch; }
+.public-site .insurance-intro > .site-button { margin-top: 24px; }
+.public-site .insurance-layout { display: grid; grid-template-columns: minmax(0, 1fr); align-items: start; gap: 40px; padding-block: 32px 56px; border-top: 1px solid var(--public-border); }
+.public-site .insurance-content { min-width: 0; }
+.public-site .insurance-overview p { margin-top: 16px; color: var(--public-muted); }
+.public-site .article-language-notice { padding: 12px 16px; border-left: 3px solid var(--public-primary); background: var(--public-background); margin-bottom: 24px; font-size: 14px; }
+.public-site .insurance-contact { min-width: 0; padding: 24px; background: var(--public-background); border: 1px solid var(--public-border); border-radius: 20px; scroll-margin-top: 104px; }
+.public-site .insurance-contact h2 { font-size: 24px; }
+.public-site .insurance-contact > p { font-size: 16px; line-height: 1.7; color: var(--public-muted); margin-block: 16px 24px; }
+.public-site .insurance-contact .contact-actions { max-width: none; width: 100%; }
+.public-site .insurance-contact .site-button { width: 100%; padding-inline: 12px; }
+.public-site .insurance-contact .contact-availability { font-size: 13px; }
+.public-site .insurance-article { font-size: 17px; line-height: 1.8; color: var(--public-ink); }
+.public-site .insurance-article[lang="en"] { font-family: var(--font-inter), Arial, sans-serif; }
+.public-site .insurance-article :where(p, ul, ol, blockquote, pre, figure, .article-table-scroll) { margin-block: 0 24px; }
+.public-site .insurance-article :where(h2, h3, h4, h5, h6) { color: var(--public-ink); margin-block: 36px 16px; font-weight: 700; letter-spacing: -.02em; line-height: 1.45; }
+.public-site .insurance-article h2 { font-size: 25px; }
+.public-site .insurance-article h3 { font-size: 22px; }
+.public-site .insurance-article :where(h4, h5, h6) { font-size: 19px; }
+.public-site .insurance-article > :first-child { margin-top: 0; }
+.public-site .insurance-article > :last-child { margin-bottom: 0; }
+.public-site .insurance-article :where(ul, ol) { padding-inline-start: 1.5em; }
+.public-site .insurance-article ul { list-style: disc; }
+.public-site .insurance-article ol { list-style: decimal; }
+.public-site .insurance-article li { padding-inline-start: 4px; margin-block: 8px; }
+.public-site .insurance-article li :where(ul, ol, p) { margin-block: 8px; }
+.public-site .insurance-article a { color: var(--public-primary-hover); text-decoration: underline; text-underline-offset: 4px; }
+.public-site .insurance-article a:hover { text-decoration-thickness: 2px; }
+.public-site .insurance-article blockquote { border-inline-start: 3px solid #8abca6; padding: 16px 24px; background: #f1f8f4; }
+.public-site .insurance-article blockquote > :last-child { margin-bottom: 0; }
+.public-site .insurance-article pre { white-space: pre-wrap; overflow-wrap: anywhere; padding: 16px; background: var(--public-background); border-radius: 8px; }
+.public-site .insurance-article code { font-size: .9em; }
+.public-site .insurance-article hr { margin-block: 32px; border: 0; border-top: 1px solid var(--public-border); }
+.public-site .insurance-article img { display: block; max-width: 100%; height: auto; margin-block: 24px; border-radius: 12px; }
+.public-site .insurance-article figcaption { font-size: 14px; color: var(--public-muted); }
+.public-site .article-image-fallback { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 28px; min-height: 120px; background: var(--public-background); border: 1px solid var(--public-border); border-radius: 12px; color: var(--public-muted); font-size: 14px; }
+.public-site .article-image-fallback svg { flex-shrink: 0; }
+.public-site .article-table-scroll { max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; border: 1px solid var(--public-border); border-radius: 12px; }
+.public-site .insurance-article table { min-width: 100%; border-collapse: collapse; text-align: start; font-size: 15px; line-height: 1.6; }
+.public-site .insurance-article caption { text-align: start; font-weight: 600; padding: 16px; }
+.public-site .insurance-article :where(th, td) { padding: 14px 16px; border: 1px solid var(--public-border); vertical-align: top; min-width: 130px; }
+.public-site .insurance-article th { background: #edf4f8; font-weight: 600; }
+.public-site .insurance-article :where(th, td) > :last-child { margin-bottom: 0; }
+.public-site .insurance-article [id] { scroll-margin-top: 104px; }
+.public-site .insurance-loading { padding-top: 40px; }
+.public-site .insurance-loading > .skeleton-card { min-height: 300px; margin-bottom: 32px; }
+html[lang="lo"] .public-site .insurance-page h1 { font-size: 30px; line-height: 1.5; letter-spacing: normal; }
+html[lang="lo"] .public-site .insurance-page h2 { line-height: 1.6; letter-spacing: normal; }
+html[lang="lo"] .public-site :where(.insurance-insurer, .insurance-category, .article-language-notice, .insurance-contact .contact-availability) { font-size: 16px; }
+.public-site .insurance-article[lang="lo"] { line-height: 1.9; }
+.public-site .insurance-article[lang="lo"] :where(h2, h3, h4, h5, h6) { letter-spacing: normal; line-height: 1.7; }
+html[lang="lo"] .public-site .insurance-article[lang="en"] h2 { line-height: 1.45; letter-spacing: -.02em; }
+@media (min-width: 768px) {
+  .public-site .insurance-intro { padding-block: 16px 48px; }
+  .public-site .insurance-page h1 { font-size: 44px; }
+  .public-site .insurance-article { font-size: 18px; }
+  .public-site .insurance-article h2 { font-size: 28px; }
+  html[lang="lo"] .public-site .insurance-page h1 { font-size: 38px; }
+}
+@media (min-width: 1024px) {
+  .public-site .insurance-layout { grid-template-columns: minmax(0, 1fr) 320px; gap: 32px; padding-block: 48px 80px; }
+  .public-site .insurance-contact[data-sticky="true"] { position: sticky; top: var(--advisor-top); }
+  .public-site .insurance-intro { padding-block: 24px 56px; }
+}

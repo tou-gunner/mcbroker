@@ -1,6 +1,6 @@
 # MC Broker public website design
 
-Status: homepage and company profile implemented and verified; insurance detail redesign pending. Updated: 2026-10-03.
+Status: homepage, company profile, and insurance detail implemented and verified. Updated: 2026-10-03.
 
 This document guides the design, implementation, and review of MC Broker's public website. The status above distinguishes delivered work from the remaining specifications. All current company information, insurance content, contact details, statistics, and other business data are development/test data.
 
@@ -112,13 +112,19 @@ While a company profile is mounted, shared header/footer advisor actions target 
 
 ### Insurance detail
 
-Use breadcrumbs Home → Insurer → Product, followed by insurer identity, product title, category, and description. From 1024px, place the reading column beside a 320px contact sidebar with a 32px gap. Keep the sidebar below the sticky header while scrolling. On smaller screens, place the contact panel after the article.
+Use breadcrumbs Home → Insurer → Product, followed by insurer identity, product title, category, and description. From 1024px, place the reading column beside a 320px contact sidebar with a 32px gap. Keep the sidebar below the sticky header while scrolling only when the whole panel fits in the viewport; otherwise leave it in normal document flow. On smaller screens, place the contact panel after the article.
 
-Present existing rich content as a readable article. Coverage, conditions, exclusions, and document links are recommended editorial sections when those details are supplied. Do not extract or invent structured policy fields, manufacture missing coverage, or create empty section headings. If rich content is absent, show the available description and a short invitation to contact an advisor.
+Present existing rich content as a readable article. Coverage, conditions, exclusions, and document links are recommended editorial sections when those details are supplied. Do not extract or invent structured policy fields, manufacture missing coverage, or create empty section headings. If published rich content is absent, retain the description in the introduction and show a short advisor invitation in the article area without repeating the description.
 
-Preserve authored content order, tables, images, and links. Constrain images to the reading column and allow wide tables to scroll inside labeled, keyboard-accessible containers. Public display styles may normalize typography and colors for readability without rewriting stored editor content.
+Preserve authored content order, tables, images, and links. Constrain images to the reading column and allow wide tables to scroll inside labeled, keyboard-accessible containers. A `sanitize-html` allowlist removes executable markup, unsafe URLs, event handlers, and authored colors/fonts from a display copy. `html-react-parser` supplies responsive image and table components. Body `h1` elements become `h2`, leaving one page title. Normalize typography and colors without rewriting stored editor content. Keep table headers and spans, namespace authored anchors, and show localized feedback when an image fails.
 
-The sidebar/panel at `#contact` includes phone and WhatsApp actions. WhatsApp messages identify the product and its absolute localized page URL. This page supports learning and inquiry; it does not display a purchase or instant-quote action.
+The sidebar/panel at `#contact` includes phone and WhatsApp actions. WhatsApp messages identify the product, insurer, and absolute localized page URL. Shared header/footer advisor links target this panel, and page contact context clears on navigation. The mobile advisor bar and footer clearance match the company page. This page supports learning and inquiry; it does not display a purchase or instant-quote action.
+
+The public detail service requires an active company and a product with `status=PUBLISHED`. Article content additionally requires `isPublished=true`. Prefer meaningful published content in the requested locale, then published English content. If English is used on the Lao page, show a localized notice and mark the article `lang="en"`. An article containing only empty editor markup does not block fallback; meaningful text or a safe image counts as content. Locale labels are authoritative; do not infer language from the text.
+
+Missing or unavailable products use localized not-found navigation; temporary read failures use an error boundary with retry. Metadata uses localized names/descriptions with the existing English fallback. The page and public detail API share the same typed Prisma service. The API retains its established 16 fields and 404/500 distinction, and never includes unpublished article HTML, JSON, text, or images. Request handlers reuse the Prisma singleton.
+
+The explicitly approved development backfill is `scripts/publish-allianz-test-articles.ts`. It targets only the 16 seeded Allianz products and their 32 EN/LO articles, rechecks active/published status, and sets the article publication flag and any missing publication date. It preserves content, versions, and existing timestamps, including `updatedAt`. It ran on 2026-10-03: 32 articles changed, then a second run changed zero. Both runs verified preservation inside a transaction. Future seed imports remain unpublished. Run without arguments for a dry run; `--apply` applies the scoped update.
 
 ### Layout sketches
 
@@ -206,7 +212,7 @@ Treat the supplied insurers, products, contacts, and business claims as test con
 
 ## 5. Implementation boundaries
 
-The app has localized public routes, database-backed company and insurance records, hero settings, banner reads, and separate public/admin root layouts. The homepage and company profile implement the shared visual system, catalog filtering, and advisor presentation described above. The insurance detail body remains a future redesign; its shared header and footer already use the new public styles.
+The app has localized public routes, database-backed company and insurance records, hero settings, banner reads, and separate public/admin root layouts. The homepage, company profile, and insurance detail implement the shared visual system and advisor presentation described above. Catalog filtering remains on the homepage and company profile; detail pages focus on reading and inquiry.
 
 - Preserve `/[locale]`, `/[locale]/company/[id]`, and `/[locale]/insurance/[id]` and the current default-locale handling in [i18n/routing.ts](i18n/routing.ts). Use its navigation helpers for internal routes. Query parameters enhance the homepage; no new listing or quote route is required.
 - Reuse the existing company fields (`name`, `description`, `logo`, `available_insurances`) and insurance fields (`name`, `description`, `category`, `thumbnail`, rich content). Derive insurer identity on detail pages from the existing company relation. Preserve active-company and published-product visibility rules.
@@ -215,7 +221,7 @@ The app has localized public routes, database-backed company and insurance recor
 - Scope new tokens and public rich-content rules under a public root class such as `.public-site`. [app/globals.css](app/globals.css) currently serves both public and admin pages and contains combined `.prose`/`.ProseMirror` selectors, including `!important` rules. Isolate the public article styling without changing editor or admin appearance.
 - Retain the existing data loading, localization, and image-storage infrastructure. Populate contact keys through the existing authenticated settings mechanism during later implementation/configuration; an admin interface redesign is not required.
 
-Website implementation and deployment are separate tasks. The company redesign introduces presentation components and internal contact context, with no public API response changes, new dependencies, or schema migrations. The product service also excludes products belonging to inactive companies. The existing `.env` is preserved.
+Website implementation and deployment are separate tasks. The company and detail redesigns introduce presentation components and shared contact context without schema migrations or public API shape changes. Detail rendering adds `sanitize-html` and `html-react-parser`. The product service also excludes products belonging to inactive companies. The existing `.env` is preserved.
 
 Company verification uses an isolated preview. `tests/company.spec.ts` covers real catalog navigation and shared contact behavior; the opt-in fixture route described in `tests/fixtures/README.md` covers synthetic failures, missing content, and long bilingual names without editing database records. Fixture routes are excluded from the final production build.
 
@@ -239,6 +245,8 @@ Future implementation review must cover:
 - [ ] CMS-authored product content remains intact and readable; admin pages and the rich-text editor retain their existing appearance.
 
 Company implementation verification passed TypeScript, scoped ESLint, an isolated production build, and browser checks for the homepage and company journey. Fixture checks cover retry, loading, missing metadata, broken images, long names, mobile interaction, and bilingual reflow. The fixture route is removed before the production build. Shared database records and the deployed service are not modified by these checks.
+
+Insurance detail verification passed TypeScript, scoped ESLint, and an isolated production build with fixture routes removed. The final production preview passed all 18 homepage/company/detail browser and API checks, including 32 concurrent detail API reads. The 16 opt-in company/detail fixture checks passed across the preview runs; five unit checks passed for visibility, fallback, API status/fields, and sanitization. Fixture checks covered 320/360/768/1024/1440px layouts, 200% zoom, short desktop heights, table keyboard scrolling, safe rich content, image failures before hydration, contact focus/context, loading, and retry. Desktop English and mobile Lao screenshots were also inspected. During verification, the deployed build and `.env` were preserved; only the authorized test-article publication flags/dates changed in the database.
 
 ## 7. Research references
 

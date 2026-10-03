@@ -23,7 +23,7 @@ test('company journey carries the homepage category but not the insurer search',
   await page.locator('.product-card').first().click();
   await expect(page).toHaveURL(new RegExp(`${productPath}$`));
   await expect(page.locator('h1')).toBeVisible();
-  await expect(page.locator('header .header-advisor')).toHaveAttribute('href', '/en#contact');
+  await expect(page.locator('header .header-advisor')).toHaveAttribute('href', '#contact');
   await page.goBack();
   await expect(page.locator('.product-card')).toHaveCount(health.length);
 });
@@ -128,6 +128,7 @@ test.describe('isolated company fixtures', () => {
   test('slow server data shows localized loading feedback before the profile', async ({ page }) => {
     await page.goto('/lo/company-preview?scenario=loading', { waitUntil: 'commit' });
     await expect(page.getByRole('status').filter({ hasText: 'ກຳລັງໂຫຼດບໍລິສັດ' })).toBeVisible();
+    await page.waitForLoadState('domcontentloaded');
     await expect(page.locator('h1')).toHaveText('Example Insurance');
     await expect(page.locator('h1')).toBeVisible();
   });

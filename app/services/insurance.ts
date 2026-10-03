@@ -39,22 +39,4 @@ export const getInsurancesByCompanyId = async (
     }));
 };
 
-export const getInsuranceById = async (id: string, locale: string = 'en'): Promise<InsuranceResponse | undefined> => {
-    try {
-        // Use absolute URL for server-side fetching
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3003';
-        const response = await fetch(`${baseUrl}/api/insurances/${id}?locale=${locale}`, {
-            cache: 'no-store'
-        });
-        
-        if (!response.ok) {
-            return undefined;
-        }
-        
-        const result = await response.json();
-        return result.data;
-    } catch (error) {
-        console.error('Error fetching insurance by ID:', error);
-        return undefined;
-    }
-};
+export { getInsuranceById } from './insurance-detail';

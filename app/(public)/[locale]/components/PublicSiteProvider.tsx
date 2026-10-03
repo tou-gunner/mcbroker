@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/routing';
 import { normalizeContact, type ContactDetails } from '@/app/utils/contact';
 
-type CompanyContact = { pathname: string; locale: string; name: string };
+type PageContact = { pathname: string; locale: string; companyName: string; productName?: string };
 
 const SiteContext = createContext<{
   contact: ContactDetails;
@@ -13,20 +13,23 @@ const SiteContext = createContext<{
   menuOpen: boolean;
   setMenuOpen: (open: boolean) => void;
   companyName?: string;
-  registerCompanyContact: (page: CompanyContact) => () => void;
+  productName?: string;
+  registerContact: (page: PageContact) => () => void;
 } | null>(null);
 
 export default function PublicSiteProvider({ children }: { children: ReactNode }) {
   const [contact, setContact] = useState<ContactDetails>({});
   const [contactLoaded, setContactLoaded] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [companyPage, setCompanyPage] = useState<CompanyContact | null>(null);
+  const [contactPage, setContactPage] = useState<PageContact | null>(null);
   const pathname = usePathname();
   const locale = useLocale();
-  const companyName = companyPage?.pathname === pathname && companyPage.locale === locale ? companyPage.name : undefined;
-  const registerCompanyContact = useCallback((page: CompanyContact) => {
-    setCompanyPage(page);
-    return () => setCompanyPage(current => current === page ? null : current);
+  const currentPage = contactPage?.pathname === pathname && contactPage.locale === locale ? contactPage : null;
+  const companyName = currentPage?.companyName;
+  const productName = currentPage?.productName;
+  const registerContact = useCallback((page: PageContact) => {
+    setContactPage(page);
+    return () => setContactPage(current => current === page ? null : current);
   }, []);
   useEffect(() => {
     const controller = new AbortController();
@@ -42,7 +45,7 @@ export default function PublicSiteProvider({ children }: { children: ReactNode }
     void load();
     return () => controller.abort();
   }, []);
-  return <SiteContext.Provider value={{ contact, contactLoaded, menuOpen, setMenuOpen, companyName, registerCompanyContact }}>{children}</SiteContext.Provider>;
+  return <SiteContext.Provider value={{ contact, contactLoaded, menuOpen, setMenuOpen, companyName, productName, registerContact }}>{children}</SiteContext.Provider>;
 }
 
 export function usePublicSite() {
@@ -55,12 +58,16 @@ const subscribeOrigin = () => () => {};
 const getOrigin = () => window.location.origin;
 const getServerOrigin = () => '';
 
-export function CompanyContactRegistration({ name }: { name: string }) {
-  const { registerCompanyContact } = usePublicSite();
+export function PageContactRegistration({ companyName, productName }: { companyName: string; productName?: string }) {
+  const { registerContact } = usePublicSite();
   const pathname = usePathname();
   const locale = useLocale();
-  useEffect(() => registerCompanyContact({ pathname, locale, name }), [registerCompanyContact, pathname, locale, name]);
+  useEffect(() => registerContact({ pathname, locale, companyName, productName }), [registerContact, pathname, locale, companyName, productName]);
   return null;
+}
+
+export function CompanyContactRegistration({ name }: { name: string }) {
+  return <PageContactRegistration companyName={name} />;
 }
 
 export function AdvisorLink(props: Omit<ComponentProps<'a'>, 'href'>) {
@@ -72,12 +79,12 @@ export function AdvisorLink(props: Omit<ComponentProps<'a'>, 'href'>) {
 }
 
 export function useWhatsAppLink() {
-  const { contact, companyName } = usePublicSite();
+  const { contact, companyName, productName } = usePublicSite();
   const locale = useLocale();
   const pathname = usePathname();
   const t = useTranslations('contact');
   const origin = useSyncExternalStore(subscribeOrigin, getOrigin, getServerOrigin);
   const pageUrl = `${origin}/${locale}${pathname === '/' ? '' : pathname}`;
-  const message = companyName ? t('companyMessage', { company: companyName, url: pageUrl }) : t('message', { url: pageUrl });
+  const message = productName && companyName ? t('productMessage', { product: productName, company: companyName, url: pageUrl }) : companyName ? t('companyMessage', { company: companyName, url: pageUrl }) : t('message', { url: pageUrl });
   return contact.whatsapp && origin ? `https://wa.me/${contact.whatsapp}?text=${encodeURIComponent(message)}` : undefined;
 }
