@@ -159,7 +159,7 @@ html[lang="lo"] .public-site { --public-font: var(--font-phetsarath), var(--font
 .public-site .mobile-advisor .site-button { width: 100%; }
 .public-site .mobile-advisor .site-button > svg:last-child { margin-left: auto; }
 .public-site .site-footer { color: #fff; background: var(--public-ink); padding-top: 48px; }
-.public-site .site-footer--home { padding-bottom: calc(90px + env(safe-area-inset-bottom)); }
+.public-site .site-footer--with-advisor { padding-bottom: calc(90px + env(safe-area-inset-bottom)); }
 .public-site .footer-grid { display: grid; gap: 36px; padding-bottom: 40px; }
 .public-site .footer-brand > p { font-size: 14px; line-height: 1.75; color: #c2d0dc; margin-top: 20px; max-width: 310px; }
 .public-site .site-footer h2 { font-size: 14px; font-weight: 700; margin-bottom: 20px; }
@@ -212,7 +212,7 @@ html[lang="lo"] .public-site :where(.category-description, .insurer-description,
   .public-site .contact-actions { max-width: 300px; width: 100%; justify-self: end; }
   .public-site .mobile-advisor { display: none; }
   .public-site .site-footer { padding-top: 64px; }
-  .public-site .site-footer--home { padding-bottom: 0; }
+  .public-site .site-footer--with-advisor { padding-bottom: 0; }
   .public-site .footer-grid { grid-template-columns: 1.4fr .8fr .9fr 1fr; gap: 48px; padding-bottom: 56px; }
   html[lang="lo"] .public-site .homepage h1 { font-size: 44px; }
   html[lang="lo"] .public-site .homepage h2 { font-size: 32px; }
@@ -233,4 +233,59 @@ html[lang="lo"] .public-site :where(.category-description, .insurer-description,
 }
 @media (prefers-reduced-motion: reduce) {
   .public-site *, .public-site *::before, .public-site *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
+}
+
+/* Insurer profiles share the public foundations while retaining detail-page type sizes. */
+.public-site .company-page h1 { font-size: 32px; line-height: 1.2; font-weight: 700; letter-spacing: -.035em; overflow-wrap: anywhere; }
+.public-site .company-page h2 { font-size: 28px; line-height: 1.25; font-weight: 700; letter-spacing: -.035em; }
+.public-site .company-page h3 { font-size: 20px; line-height: 1.35; font-weight: 700; letter-spacing: -.02em; overflow-wrap: anywhere; }
+.public-site .company-breadcrumbs { padding-block: 24px; color: var(--public-muted); font-size: 13px; }
+.public-site .company-breadcrumbs ol { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; list-style: none; padding: 0; }
+.public-site .company-breadcrumbs li { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.public-site .company-breadcrumbs li:last-child { flex: 0 1 auto; }
+.public-site .company-breadcrumbs svg { width: 9px; flex-shrink: 0; }
+.public-site .company-breadcrumbs a { min-height: 44px; display: inline-flex; align-items: center; color: var(--public-primary-hover); text-underline-offset: 4px; }
+.public-site .company-breadcrumbs a:hover { text-decoration: underline; }
+.public-site .company-breadcrumbs [aria-current] { overflow-wrap: anywhere; }
+.public-site .company-intro { display: grid; gap: 24px; padding-block: 8px 48px; }
+.public-site .company-intro-copy { min-width: 0; }
+.public-site .company-logo { width: 160px; height: 128px; background: white; border: 1px solid var(--public-border); border-radius: 20px; font-size: 40px; }
+.public-site .company-logo img { padding: 20px; }
+.public-site .company-description { max-width: 65ch; margin-top: 20px; color: var(--public-muted); white-space: pre-line; overflow-wrap: anywhere; }
+.public-site .company-categories { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; margin-top: 24px; }
+.public-site .company-categories li, .public-site .product-category { color: #315e4b; background: var(--public-accent); font-size: 12px; padding: 5px 10px; border-radius: 6px; line-height: 1.6; }
+.public-site .company-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+.public-site .company-page .contact-copy { min-width: 0; overflow-wrap: anywhere; }
+.public-site .company-page .contact-actions { min-width: 0; }
+.public-site .company-products-section { background: var(--public-background); border-block: 1px solid var(--public-border); margin-bottom: 48px; }
+.public-site .product-card { display: flex; flex-direction: column; min-width: 0; border: 1px solid var(--public-border); border-radius: 20px; background: white; color: var(--public-ink); text-decoration: none; transition: box-shadow 180ms, border-color 180ms; }
+.public-site .product-card:hover { border-color: var(--public-control-border); box-shadow: 0 8px 24px rgb(16 45 71 / 8%); }
+.public-site .product-image { width: 100%; aspect-ratio: 16 / 9; background: var(--public-accent); border-radius: 19px 19px 0 0; border-bottom: 1px solid var(--public-border); }
+.public-site .product-image img { object-fit: contain; background: white; }
+.public-site .product-image .asset-placeholder { color: #447e67; font-size: 44px; }
+.public-site .product-card-copy { display: flex; flex-direction: column; align-items: flex-start; flex: 1; min-width: 0; padding: 24px; }
+.public-site .product-category { margin-bottom: 16px; }
+.public-site .product-description { margin-top: 12px; color: var(--public-muted); font-size: 14px; line-height: 1.65; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+.public-site .product-card .card-link { width: 100%; margin-top: auto; }
+.public-site .product-card h3, .public-site .product-description { margin-bottom: 24px; }
+.public-site .product-card h3:has(+ .product-description) { margin-bottom: 0; }
+.public-site .catalog-state-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.public-site .company-unavailable, .public-site .company-loading { padding-block: 48px; }
+.public-site .company-loading .skeleton-card { min-height: 300px; }
+.public-site .product-skeleton > div { width: 100%; height: auto; aspect-ratio: 16 / 9; }
+html[lang="lo"] .public-site .company-page h1 { font-size: 30px; line-height: 1.45; letter-spacing: normal; }
+html[lang="lo"] .public-site .company-page h2 { font-size: 26px; line-height: 1.5; letter-spacing: normal; }
+html[lang="lo"] .public-site .company-page h3 { line-height: 1.5; letter-spacing: normal; }
+html[lang="lo"] .public-site :where(.company-breadcrumbs, .company-categories li, .product-category, .product-description) { font-size: 16px; line-height: 1.7; }
+@media (min-width: 768px) {
+  .public-site .company-intro { grid-template-columns: 160px minmax(0, 1fr); gap: 40px; }
+}
+@media (min-width: 1024px) {
+  .public-site .company-intro { padding-block: 24px 80px; gap: 48px; }
+  .public-site .company-page h1 { font-size: 44px; }
+  .public-site .company-page h2 { font-size: 36px; }
+  .public-site .company-page h3 { font-size: 22px; }
+  .public-site .company-products-section { margin-bottom: 80px; }
+  html[lang="lo"] .public-site .company-page h1 { font-size: 38px; }
+  html[lang="lo"] .public-site .company-page h2 { font-size: 32px; }
 }

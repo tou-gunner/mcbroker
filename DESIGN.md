@@ -1,8 +1,8 @@
 # MC Broker public website design
 
-Status: approved design direction; website implementation pending. Updated: 2026-10-01.
+Status: homepage and company profile implemented and verified; insurance detail redesign pending. Updated: 2026-10-03.
 
-This document specifies the intended redesign of MC Broker's public website. It is a guide for design, implementation, and review; it does not describe features as already delivered. All current company information, insurance content, contact details, statistics, and other business data are development/test data.
+This document guides the design, implementation, and review of MC Broker's public website. The status above distinguishes delivered work from the remaining specifications. All current company information, insurance content, contact details, statistics, and other business data are development/test data.
 
 ## 1. Purpose and scope
 
@@ -100,7 +100,15 @@ Use breadcrumbs Home → Insurers → Company name, with Insurers returning to t
 
 Below the introduction, show published products using the same one/two/three-column grid as the directory. Product cards contain a thumbnail or category placeholder, category label, complete product name, a short description, and View details. Preserve the existing featured/priority ordering without inventing recommendation or popularity badges.
 
+The company introduction includes Browse products and Talk to an advisor links to `#company-products` and `#contact`. Product thumbnails use contained 16:9 frames, descriptions preview up to three lines, and complete titles wrap naturally. The profile has a localized document title and description.
+
+Product browsing uses a labeled name search and All plus the categories present in this company's published products. Combine filters using company-page `q` and `category` parameters, with the same normalization, history, clear, and locale-preservation behavior as the homepage. An unknown category or a category not offered by this company resolves to All. Forward the selected homepage category when opening a company; do not forward the insurer-name search into the product-name search. Product names without metadata receive a localized fallback; unknown product categories remain visible under All with a generic insurance label and icon.
+
+Company and product data are server-rendered through the existing services; filtering runs locally without additional product requests. A product request failure keeps the company introduction and entered filters visible, with Retry refreshing server data. Profile request failures have a separate localized error boundary; missing or archived companies use the localized not-found view. Loading reserves space for the introduction and product cards.
+
 End with an advisor panel at `#contact`, including company context in the WhatsApp message. A company with no published products receives a clear localized empty state and links to the directory and contact panel.
+
+While a company profile is mounted, shared header/footer advisor actions target its contact panel and shared WhatsApp links include its name and localized page URL. This context is cleared on navigation. The company page uses the same mobile advisor bar and footer clearance as the homepage.
 
 ### Insurance detail
 
@@ -198,7 +206,7 @@ Treat the supplied insurers, products, contacts, and business claims as test con
 
 ## 5. Implementation boundaries
 
-The app already has localized public routes, database-backed company and insurance records, hero settings, banner reads, and separate public/admin root layouts. Search, the new contact presentation, the visual tokens, and the page arrangements above are target behavior, not assertions about current functionality.
+The app has localized public routes, database-backed company and insurance records, hero settings, banner reads, and separate public/admin root layouts. The homepage and company profile implement the shared visual system, catalog filtering, and advisor presentation described above. The insurance detail body remains a future redesign; its shared header and footer already use the new public styles.
 
 - Preserve `/[locale]`, `/[locale]/company/[id]`, and `/[locale]/insurance/[id]` and the current default-locale handling in [i18n/routing.ts](i18n/routing.ts). Use its navigation helpers for internal routes. Query parameters enhance the homepage; no new listing or quote route is required.
 - Reuse the existing company fields (`name`, `description`, `logo`, `available_insurances`) and insurance fields (`name`, `description`, `category`, `thumbnail`, rich content). Derive insurer identity on detail pages from the existing company relation. Preserve active-company and published-product visibility rules.
@@ -207,7 +215,9 @@ The app already has localized public routes, database-backed company and insuran
 - Scope new tokens and public rich-content rules under a public root class such as `.public-site`. [app/globals.css](app/globals.css) currently serves both public and admin pages and contains combined `.prose`/`.ProseMirror` selectors, including `!important` rules. Isolate the public article styling without changing editor or admin appearance.
 - Retain the existing data loading, localization, and image-storage infrastructure. Populate contact keys through the existing authenticated settings mechanism during later implementation/configuration; an admin interface redesign is not required.
 
-Website implementation and deployment are separate tasks. This documentation change adds no runtime API, type, dependency, or schema changes.
+Website implementation and deployment are separate tasks. The company redesign introduces presentation components and internal contact context, with no public API response changes, new dependencies, or schema migrations. The product service also excludes products belonging to inactive companies. The existing `.env` is preserved.
+
+Company verification uses an isolated preview. `tests/company.spec.ts` covers real catalog navigation and shared contact behavior; the opt-in fixture route described in `tests/fixtures/README.md` covers synthetic failures, missing content, and long bilingual names without editing database records. Fixture routes are excluded from the final production build.
 
 ## 6. Accessibility and acceptance
 
@@ -228,7 +238,7 @@ Future implementation review must cover:
 - [ ] Reduced-motion behavior, reserved image space, responsive image sizing, and no automatic banner rotation.
 - [ ] CMS-authored product content remains intact and readable; admin pages and the rich-text editor retain their existing appearance.
 
-For the documentation change, review Markdown structure, local links, agreement with the chosen direction, and the separation between existing behavior and proposed behavior. Application builds and tests are unnecessary until website code changes.
+Company implementation verification passed TypeScript, scoped ESLint, an isolated production build, and browser checks for the homepage and company journey. Fixture checks cover retry, loading, missing metadata, broken images, long names, mobile interaction, and bilingual reflow. The fixture route is removed before the production build. Shared database records and the deployed service are not modified by these checks.
 
 ## 7. Research references
 

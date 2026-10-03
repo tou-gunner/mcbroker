@@ -127,7 +127,9 @@
     "whatsapp": "Chat on WhatsApp",
     "loading": "Loading contact options…",
     "unavailable": "Some contact options are not available yet. Please check back later.",
-    "message": "Hello MC Broker, I would like to discuss my insurance options. I am viewing {url}"
+    "message": "Hello MC Broker, I would like to discuss my insurance options. I am viewing {url}",
+    "companyMessage": "Hello MC Broker, I would like to discuss insurance from {company}. I am viewing {url}",
+    "companyBody": "Have a question about {company}? Discuss the available plans and your priorities with an MC Broker advisor."
   },
   "footer": {
     "brandBlurb": "A place to explore insurance for your life, family, and business in Laos. Understand your options, one step at a time.",
@@ -137,5 +139,40 @@
     "contactTitle": "Get in touch",
     "copyright": "All rights reserved",
     "tagline": "More clarity. More confidence."
+  },
+  "company": {
+    "breadcrumbs": "Breadcrumbs",
+    "eyebrow": "Get to know the insurer",
+    "unnamed": "Insurance company",
+    "availableCategories": "Available insurance types",
+    "browseProducts": "Browse products",
+    "productsEyebrow": "Explore the cover",
+    "productsTitle": "Find a plan for what matters.",
+    "productsSubtitle": "Browse this insurer’s products, then open a plan to read the details.",
+    "searchLabel": "Search products",
+    "searchPlaceholder": "Search by product name",
+    "filterLabel": "Type of insurance",
+    "all": "All",
+    "clear": "Clear filters",
+    "results": "{count, plural, =0 {No products found} one {# product found} other {# products found}}",
+    "viewDetails": "View details",
+    "unnamedProduct": "Insurance plan",
+    "otherCategory": "Insurance",
+    "emptyTitle": "No products listed yet",
+    "emptyBody": "This insurer has no published products to browse right now. Explore other insurers or check the advisor contact options below.",
+    "backToDirectory": "Explore other insurers",
+    "askAdvisor": "Find advisor contact options",
+    "noMatchesTitle": "No matching products",
+    "noMatchesBody": "No products match “{query}” in {category}. Try another name or clear your filters.",
+    "loadingProducts": "Loading products…",
+    "loadingCompany": "Loading insurer…",
+    "retry": "Try again",
+    "productsErrorTitle": "We couldn’t load the products",
+    "productsErrorBody": "Please try again. Your search and filters will be kept.",
+    "errorTitle": "We couldn’t load this insurer",
+    "errorBody": "There was a problem loading the page. Try again or explore the insurer directory.",
+    "unavailableTitle": "This insurer isn’t available",
+    "unavailableBody": "The insurer you’re looking for could not be found or is no longer listed. Explore the directory to find other options.",
+    "metaDescription": "Explore an insurer’s products and discuss your options with MC Broker."
   }
 }

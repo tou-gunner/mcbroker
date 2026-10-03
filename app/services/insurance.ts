@@ -15,7 +15,7 @@ export const getInsurancesByCompanyId = async (
     locale: string = 'en',
 ): Promise<InsuranceResponse[]> => {
     const insurances = await prisma.insurance.findMany({
-        where: { companyId, status: 'PUBLISHED' },
+        where: { companyId, status: 'PUBLISHED', company: { isActive: true } },
         include: {
             category: { include: { metadata: { where: { key: 'name' } } } },
             metadata: true,

@@ -5,7 +5,7 @@ import { FaArrowUpRightFromSquare, FaBars, FaXmark, FaShieldHeart } from 'react-
 import { Link } from '@/i18n/routing';
 import LocaleSwitcher from './LocaleSwitcher';
 import AssetImage from './ui/AssetImage';
-import { usePublicSite } from './PublicSiteProvider';
+import { AdvisorLink, usePublicSite } from './PublicSiteProvider';
 
 const links = [
   ['types', '/#insurance-types'], ['companies', '/#company-list'], ['howItWorks', '/#how-it-works'], ['faq', '/#faq'],
@@ -47,7 +47,7 @@ export default function NavigationBar() {
       </nav>
       <div className="header-actions">
         <LocaleSwitcher />
-        <Link className="site-button site-button--primary header-advisor" href="/#contact">{t('contact')}<FaArrowUpRightFromSquare aria-hidden="true" /></Link>
+        <AdvisorLink className="site-button site-button--primary header-advisor">{t('contact')}<FaArrowUpRightFromSquare aria-hidden="true" /></AdvisorLink>
         <button ref={trigger} className="icon-button menu-trigger" type="button" aria-label={t('openMenu')} aria-expanded={menuOpen} aria-controls="mobile-menu" onClick={() => setMenuOpen(true)}><FaBars aria-hidden="true" /></button>
       </div>
     </div>
@@ -69,7 +69,7 @@ export default function NavigationBar() {
         <nav aria-label={t('main')}>
           {links.map(([key, href]) => <Link href={href} key={key} onClick={() => setMenuOpen(false)}>{t(key)}<span aria-hidden="true">↗</span></Link>)}
         </nav>
-        <Link href="/#contact" className="site-button site-button--primary" onClick={() => setMenuOpen(false)}>{t('contact')}</Link>
+        <AdvisorLink className="site-button site-button--primary" onClick={() => setMenuOpen(false)}>{t('contact')}</AdvisorLink>
       </div>
     </dialog>
   </header>;

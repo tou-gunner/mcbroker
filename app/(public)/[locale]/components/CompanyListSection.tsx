@@ -37,8 +37,9 @@ export default function CompanyListSection() {
 function CompanyCard({ company }: { company: CompanyResponse }) {
   const t = useTranslations('companies');
   const categories = useTranslations('categories.items');
+  const { selectedFilter } = useAppContext();
   const slugs = company.available_insurances.filter((slug): slug is CategorySlug => CATEGORY_SLUGS.includes(slug as CategorySlug));
-  return <Link href={`/company/${company.id}`} className="insurer-card" prefetch={false}>
+  return <Link href={`/company/${company.id}${selectedFilter === 'all' ? '' : `?category=${selectedFilter}`}`} className="insurer-card" prefetch={false}>
     <div className="insurer-card-top"><AssetImage src={company.logo} alt="" sizes="112px" className="insurer-logo" fallback={<FaBuilding />} /><span className="card-arrow" aria-hidden="true"><FaArrowRight /></span></div>
     <h3>{company.name || t('unnamed')}</h3>
     {company.description && <p className="insurer-description">{company.description}</p>}
